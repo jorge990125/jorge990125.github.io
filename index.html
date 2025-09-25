@@ -15,16 +15,19 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">Olympus</a>
+            <a class="navbar-brand" href="index.html">Olympus</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
                     <li class="nav-item"><a class="nav-link" href="#historia">Historia</a></li>
                     <li class="nav-item"><a class="nav-link" href="#emuladores">Emuladores</a></li>
                     <li class="nav-item"><a class="nav-link" href="#olympus">Olympus</a></li>
                     <li class="nav-item"><a class="nav-link" href="#caracteristicas">Características</a></li>
+                    <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="repack.html">Repack</a></li>
                     <li class="nav-item"><a class="nav-link" href="#descargas">Descargas</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
                 </ul>
@@ -34,75 +37,232 @@
 
     <!-- Hero -->
     <header class="bg-dark text-light text-center py-5">
-        <div class="container">
-            <img src="/assets/img/olympus.png" class="img-fluid mb-3" alt="Olympus">
-            <h1>Olympus Shop</h1>
-            <p class="lead">Historia y evolución de la emulación de World of Warcraft</p>
-        </div>
+    <div class="container">
+        <img src="/assets/img/olympus.png" class="img-fluid mb-3" alt="Olympus">
+        <h1>Olympus Project</h1>
+        <p class="lead">
+            Este es mi proyecto privado dedicado a la <strong>investigación y desarrollo</strong> en la emulación de 
+            <em>World of Warcraft</em>.
+        </p>
+        <p>
+            Trabajo en sistemas personalizados, optimización del núcleo y nuevas formas de entender 
+            la evolución de la emulación, con un enfoque especial en la expansión <strong>Cataclysm</strong>.
+        </p>
+    </div>
     </header>
 
-    <!-- Historia -->
-    <section id="historia" class="py-5">
-        <div class="container">
-            <h2 class="mb-4">Historia de la Emulación de WoW</h2>
-            <p>Desde los primeros días de World of Warcraft, la comunidad de jugadores buscó maneras de recrear la experiencia del juego fuera de los servidores oficiales de Blizzard. Esto llevó al nacimiento de los <strong>servidores privados</strong> y los proyectos de emulación.</p>
-            <p>La emulación permitió estudiar cómo funcionaba el juego y ofrecer experiencias alternativas, preservando expansiones pasadas y desarrollando servidores personalizados.</p>
-        </div>
-    </section>
 
-    <!-- Emuladores -->
-    <section id="emuladores" class="bg-light py-5">
-        <div class="container">
-            <h2 class="mb-4">Proyectos de Emulación Destacados</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <h4>TrinityCore</h4>
-                    <p>Uno de los proyectos más populares y activos, especialmente enfocado en expansiones como Wrath of the Lich King y Cataclysm.</p>
-                </div>
-                <div class="col-md-4">
-                    <h4>AzerothCore</h4>
-                    <p>Basado en TrinityCore, busca ofrecer modularidad y facilidad de uso, con gran soporte de la comunidad y plugins.</p>
-                </div>
-                <div class="col-md-4">
-                    <h4>MaNGOS</h4>
-                    <p>El pionero en la emulación de WoW. De aquí partieron varios forks como TrinityCore y CMaNGOS.</p>
-                </div>
+    <!-- Historia -->
+<section id="historia" class="py-5">
+    <div class="container">
+        <h2 class="mb-4">Historia de la Emulación de WoW</h2>
+        <p>
+            Desde el lanzamiento de <strong>World of Warcraft</strong> en 2004, la comunidad de jugadores ha mostrado un gran interés en
+            comprender y recrear su funcionamiento. Con el paso del tiempo, surgió la necesidad de mantener vivas las
+            expansiones clásicas y experimentar con nuevas ideas que los servidores oficiales de Blizzard no ofrecían.
+        </p>
+        <p>
+            Así nació el concepto de los <strong>servidores privados</strong>, impulsados por proyectos de <em>emulación</em>. Estos no solo
+            reproducían las mecánicas del juego original, sino que también permitieron la creación de sistemas personalizados,
+            economías alternativas y experiencias de juego únicas que marcaron la historia de la comunidad.
+        </p>
+        <p>
+            La emulación también se convirtió en una herramienta de <strong>investigación y preservación</strong>, ya que permitió estudiar el
+            comportamiento del juego, analizar su arquitectura y mantener accesibles versiones antiguas como Vanilla, The Burning
+            Crusade o Wrath of the Lich King, que de otra forma habrían quedado en el olvido.
+        </p>
+    </div>
+</section>
+
+<!-- Emuladores -->
+<section id="emuladores" class="bg-light py-5">
+    <div class="container">
+        <h2 class="mb-4">Proyectos de Emulación Destacados</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <h4>TrinityCore</h4>
+                <p>
+                    Es uno de los proyectos más activos y robustos de emulación de WoW. Se centra principalmente en 
+                    <strong>Wrath of the Lich King (3.3.5a)</strong> y <strong>Cataclysm</strong>, ofreciendo un núcleo estable y 
+                    constantemente actualizado por la comunidad.
+                </p>
+                <p>
+                    Sitio web: <a href="https://www.trinitycore.org/" target="_blank">trinitycore.org</a><br>
+                    Repositorio: <a href="https://github.com/TrinityCore/TrinityCore" target="_blank">GitHub - TrinityCore</a>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h4>AzerothCore</h4>
+                <p>
+                    Basado en TrinityCore, este proyecto busca ofrecer una experiencia más <strong>modular</strong>, ideal para servidores
+                    personalizados. Su comunidad es muy activa y cuenta con una gran variedad de <em>módulos/plugins</em> que facilitan
+                    la expansión del núcleo sin modificar su base.
+                </p>
+                <p>
+                    Sitio web: <a href="https://www.azerothcore.org/" target="_blank">azerothcore.org</a><br>
+                    Repositorio: <a href="https://github.com/azerothcore/azerothcore-wotlk" target="_blank">GitHub - AzerothCore</a>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h4>MaNGOS</h4>
+                <p>
+                    El pionero en la emulación de WoW. Fue el primer núcleo de código abierto que permitió el desarrollo de
+                    servidores privados. De este proyecto nacieron forks tan importantes como <strong>TrinityCore</strong> y 
+                    <strong>CMaNGOS</strong>.
+                </p>
+                <p>
+                    Sitio web: <a href="https://getmangos.eu/" target="_blank">getmangos.eu</a><br>
+                    Repositorio: <a href="https://github.com/mangoszero/server" target="_blank">GitHub - MaNGOS</a>
+                </p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Olympus -->
-    <section id="olympus" class="py-5">
-        <div class="container">
-            <h2 class="mb-4">Olympus Cataclysm</h2>
-            <p>Olympus es nuestro proyecto privado de emulación para la expansión <strong>Cataclysm 4.3.4</strong>. Incluye sistemas personalizados como:</p>
-            <ul>
-                <li>Sistema Lua.</li>
-                <li>Sistema VIP y suscripción.</li>
-                <li>Arenas 1vs1 con MMR.</li>
-                <li>Crossfaction PvP y PvE.</li>
-                <li>NPCs de teleport, boost, profesiones y rates.</li>
-                <li>Transmog Custom y títulos PvP automáticos.</li>
-            </ul>
-        </div>
-    </section>
+<!-- Blizzcms -->
 
-    <!-- Características -->
-    <section id="caracteristicas" class="bg-light py-5">
-        <div class="container">
-            <h2 class="mb-4">Características del Servidor</h2>
-            <p>El servidor Olympus busca ofrecer una experiencia única, combinando elementos blizzlike con innovaciones propias.</p>
+<section id="blizzcms" class="bg-light py-5">
+    <div class="container">
+        <h2 class="mb-4">Historia de BlizzCMS</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <h4>BlizzCMS 1.x (Tradicional)</h4>
+                <p>
+                    La primera versión de BlizzCMS, conocida como 1.x, fue la base para la creación de sitios web
+                    para servidores privados de WoW. Su enfoque estaba en ofrecer un sistema simple, estable y
+                    funcional para la gestión de usuarios, tiendas y contenido del servidor.
+                </p>
+                <p>
+                    Sitio web: <a href="https://wow-cms.com/" target="_blank">WoW CMS</a><br>
+                    Repositorio: <a href="https://github.com/WoW-CMS/BlizzCMS.git" target="_blank">GitHub - BlizzCMS 1.x</a>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h4>BlizzCMS 2</h4>
+                <p>
+                    La segunda versión mejoró la estructura y diseño del CMS, añadiendo compatibilidad con múltiples
+                    módulos, sistema de tienda mejorado, gestión de usuarios avanzada y un panel de administración
+                    más flexible para servidores privados.
+                </p>
+                <p>
+                    Sitio web: <a href="https://wow-cms.com/" target="_blank">WoW CMS</a><br>
+                    Repositorio: <a href="https://github.com/WoW-CMS/BlizzCMS" target="_blank">GitHub - BlizzCMS 2</a>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h4>NexusCMS</h4>
+                <p>
+                    La evolución más reciente de BlizzCMS es NexusCMS, una plataforma más moderna y modular,
+                    diseñada para ofrecer una base sólida y escalable, con soporte para nuevas tecnologías web,
+                    personalización de módulos y un diseño más dinámico y responsivo.
+                </p>
+                <p>
+                    Sitio web: <a href="https://wow-cms.com/" target="_blank">WoW CMS</a><br>
+                    Repositorio: <a href="https://github.com/WoW-CMS/NexusCMS" target="_blank">GitHub - NexusCMS</a>
+                </p>
+            </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Descargas -->
-    <section id="descargas" class="py-5 text-center">
-        <div class="container">
-            <h2 class="mb-4">Descargar Demo</h2>
-            <a href="https://drive.google.com/file/d/1olEACwxbiCVO6iGnluI2dzXL0uuDFF06/view?usp=sharing" target="_blank" class="btn btn-success btn-lg mx-2">Release+DB</a>
-            <a href="https://drive.google.com/file/d/1m8YvO8KWwTHj_leD_-NpXxpQYL19kiXd/view?usp=sharing" target="_blank" class="btn btn-success btn-lg mx-2">Data</a>
-        </div>
-    </section>
+<!-- Olympus -->
+<section id="olympus" class="py-5">
+    <div class="container">
+        <h2 class="mb-4">Mi Proyecto Privado: Olympus Cataclysm</h2>
+        <p>
+            Olympus Cataclysm es mi proyecto privado de emulación para la expansión <strong>Cataclysm 4.3.4</strong>, 
+            que surgió junto a dos amigos cercanos, <strong>Liosbel</strong> y <strong>Niobel</strong>. 
+            La idea nació del deseo de entender y experimentar cómo funciona World of Warcraft a nivel interno, 
+            más allá de la experiencia del jugador común. Nuestro objetivo principal era traer un servidor de Cataclysm 
+            enfocado en la <strong>comunidad cubana</strong>, creando un espacio donde los jugadores pudieran disfrutar del juego 
+            de manera cercana a la experiencia original, pero adaptada a nuestras necesidades locales.
+        </p>
+        <p>
+            Juntos comenzamos explorando los servidores privados existentes, analizando cómo se gestionaban los datos, 
+            cómo se programaban los sistemas y cómo se configuraban los distintos módulos. Este proceso no solo nos permitió 
+            entender la arquitectura de WoW, sino también identificar oportunidades para mejorar la experiencia de los jugadores, 
+            implementar sistemas personalizados y ofrecer un servidor estable y divertido.
+        </p>
+        <p>
+            Desde los primeros pasos, Olympus Cataclysm se convirtió en un proyecto de aprendizaje y experimentación constante. 
+            Cada cambio que realizo en el servidor, cada módulo que desarrollo o ajusto, refleja no solo mi conocimiento técnico, 
+            sino también mi pasión por recrear una experiencia auténtica de World of Warcraft, adaptada a nuestra comunidad.
+
+        </p>
+        <p>
+            Olympus no solo representa un servidor, sino un espacio de experimentación y desarrollo personal. 
+            Mi objetivo ha sido aprender, perfeccionar habilidades técnicas y, al mismo tiempo, crear un entorno funcional y entretenido. 
+            Cada sistema que agrego, ya sea un módulo de suscripción VIP, arenas 1vs1 con MMR o crossfaction PvP, 
+            es fruto de horas de investigación, prueba y error, y colaboración con mis amigos.
+        </p>
+        <p>
+            El proyecto también me ha enseñado sobre planificación, resolución de problemas y adaptabilidad, ya que no siempre los sistemas funcionan 
+            como uno espera y es necesario buscar soluciones creativas. Olympus Cataclysm refleja tanto mi pasión por la emulación de WoW 
+            como mi crecimiento en programación, gestión de servidores y desarrollo de videojuegos.
+        </p>
+		<p>
+            Durante este proyecto, he implementado varios sistemas personalizados en diferentes puntos del servidor, enfrentándome a 
+            retos reales de programación y diseño que me han permitido mejorar mis habilidades y comprensión del motor de juego.
+            Cada módulo que agrego o ajusto es una oportunidad de aprendizaje, desde scripts en Lua hasta la personalización de la experiencia
+            PvP y PvE.
+        </p>
+        <p>
+            Entre los sistemas que he desarrollado y adaptado personalmente se encuentran:
+        </p>
+        <ul>
+            <li>Sistema VIP y suscripción para mejorar la experiencia del jugador.</li>
+            <li>Arenas 1vs1 con MMR y balance de combate ajustado por mí.</li>
+            <li>Crossfaction PvP y PvE, diseñando la interacción entre jugadores de diferentes facciones.</li>
+            <li>NPCs de teleport, boost, profesiones y rates, optimizados según la jugabilidad que busco.</li>
+            <li>Transmog Custom y títulos PvP automáticos, implementados con atención al detalle y estética.</li>
+            <li>Entre otros...</li>
+        </ul>
+        <p>
+            Este proyecto no solo es una manera de aplicar mis conocimientos, sino también de experimentar y entender cada capa del servidor 
+            y su funcionamiento, desde la lógica interna hasta la experiencia de juego del usuario.
+        </p>
+    </div>
+</section>
+
+<!-- Características -->
+<section id="caracteristicas" class="bg-light py-5">
+    <div class="container">
+        <h2 class="mb-4">Lo Que He Aprendido y Desarrollado</h2>
+        <p>
+            Trabajar en Olympus me ha permitido desarrollar habilidades prácticas en programación de servidores, bases de datos, sistemas 
+            de juego y administración de entornos virtuales. Cada característica que implementé representa un desafío superado y un 
+            aprendizaje adquirido. 
+        </p>
+        <ul>
+            <li>Comprensión profunda del motor de WoW y su emulación.</li>
+            <li>Diseño y programación de sistemas personalizados, como boosts y transmog.</li>
+            <li>Gestión de módulos y scripts Lua para adaptarlos a mi visión del servidor.</li>
+            <li>Implementación de sistemas PvP balanceados y experiencias PvE ajustadas.</li>
+            <li>Desarrollo de NPCs funcionales y dinámicos que mejoran la interacción con los jugadores.</li>
+        </ul>
+        <p>
+            Cada nueva función que agrego me enseña algo sobre la arquitectura de servidores, optimización y cómo crear una experiencia 
+            divertida y estable para los jugadores.
+        </p>
+    </div>
+</section>
+
+<!-- Descargas -->
+<section id="descargas" class="py-5 text-center">
+    <div class="container">
+        <h2 class="mb-4">Descargar Demo de Olympus</h2>
+        <p>
+            He preparado una versión de demostración del servidor para que puedas explorar mi trabajo y ver cómo funcionan 
+            los sistemas que he desarrollado personalmente.
+        </p>
+        <a href="https://github.com/Olympuswow/Repack-cata/releases/download/db+release/ServerCata.7zip" target="_blank" class="btn btn-success btn-lg me-2">Releas + DB</a>
+        <a href="https://www.mediafire.com/file/fh3j56feeq1q9ht/dbc.rar" target="_blank" class="btn btn-success btn-lg">DBC</a>
+        <a href="http://www.mediafire.com/file/cygl52djcr15rf5/maps.zip" target="_blank" class="btn btn-success btn-lg">MAPS</a>
+        <a href="https://mega.nz/#!rI0BlaTb!kK5qvCDPxETu0deg5t35vXRXEDnb3zq0THIkNu07dZ0" target="_blank" class="btn btn-success btn-lg">MMAPS</a>
+        <a href="http://www.mediafire.com/file/c0b79kud0gl6va3/vmaps.zip" target="_blank" class="btn btn-success btn-lg">VMAPS</a>
+    </div>
+</section>
+
 
     <!-- Contacto -->
     <footer id="contacto" class="bg-dark text-light py-4">
