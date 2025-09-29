@@ -1,0 +1,2317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>OlympusCore — Documentación | Olympus</title>
+  <meta name="description" content="Documentación técnica de OlympusCore (Cataclysm 4.3.4) — arquitectura, bases de datos, componentes y despliegue.">
+  <meta property="og:title" content="OlympusCore — Documentación">
+  <meta property="og:description" content="Documentación técnica de OlympusCore para Cataclysm 4.3.4">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+  <!-- Mermaid.js (diagramas dinámicos en el navegador) -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
+
+  <style>
+    .wiki-container { max-width: 1100px; margin: 2.5rem auto; padding: 1.75rem; }
+    .wiki-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; padding: 1.5rem; }
+    .small-muted { color: #9aa6b2; font-size: .9rem; }
+    pre.ascii { background: rgba(255,255,255,0.02); padding: .75rem; border-radius: 6px; color: #cfe3ff; overflow:auto; }
+    .sources { font-size: .9rem; color: #9aa6b2; }
+    .badge-update { background: #2b6cb0; color: #fff; border-radius: 6px; padding: 0.2rem .5rem; }
+    table.table-dark th, table.table-dark td { vertical-align: middle; }
+    .mermaid { background: transparent; color: #e9eef6; }
+  </style>
+</head>
+<body>
+  <!-- Navbar (igual a tu sitio principal) -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img src="/assets/img/logo.png" alt="Olympus" height="36">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#historia">Historia</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#emuladores">Emuladores</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#olympus">Olympus</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#caracteristicas">Características</a></li>
+            <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
+            <li class="nav-item"><a class="nav-link" href="repack.html">Repack</a></li>					
+            <li class="nav-item"><a class="nav-link" href="wiki.html">Wiki</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#descargas">Descargas</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#contacto">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenedor principal -->
+  <main class="wiki-container text-light">
+    <div class="wiki-card">
+    <header class="mb-4">
+      <h1 class="mb-1">OlympusCore (Cataclysm 4.3.4) - Wiki Educativa</h1>
+      <p class="small-muted mb-1">
+  Esta wiki documenta <strong>OlympusCore</strong>, un emulador de <em>World of Warcraft: Cataclysm (4.3.4)</em>, con fines estrictamente educativos y de aprendizaje técnico. 
+  Su contenido refleja un análisis exhaustivo de la arquitectura del núcleo, el sistema de scripts, la inteligencia artificial de NPCs, encuentros de raid, mecánicas de instancias y la integración de características personalizadas.
+</p>
+<p class="small-muted mb-1">
+  La información incluida se obtuvo a través de estudio, pruebas prácticas, depuración de scripts, experimentación con instancias y análisis de la interacción entre sistemas, con el objetivo de comprender cómo se implementan y coordinan las distintas funcionalidades dentro del emulador.
+</p>
+<p class="small-muted mb-1">
+  Este material no incluye la distribución del emulador y se comparte únicamente como recurso pedagógico (repack). La guía sirve como referencia técnica, didáctica y de desarrollo, orientada a estudiantes, desarrolladores y entusiastas que buscan profundizar en la ingeniería y personalización de servidores privados de WoW.
+</p>
+<p class="small-muted mb-1">
+  Cada sección detalla conceptos clave, patrones de scripting, arquitectura de IA, eventos, habilidades y coordinación de encuentros, permitiendo al lector entender tanto la lógica subyacente como las mejores prácticas de desarrollo en un entorno de emulación.
+</p>
+<p class="small-muted mb-0">
+  La wiki fomenta un aprendizaje responsable y ético, respetando los derechos de propiedad intelectual de Blizzard Entertainment y limitando su alcance a fines educativos y de investigación técnica.
+</p>
+
+      <p class="small-muted mb-1">
+        Documentación realizada por <strong>Jorge Luis Ramirez Lorenzo</strong>. Última actualización: <span class="badge-update">29 de septiembre de 2025</span>.
+      </p>
+    </header>
+
+    <!-- Resumen de contenidos -->
+    <section class="wiki-summary mb-3">
+      <h2 class="mb-2">Resumen de la Wiki</h2>
+      <ul>
+        <li><strong>Scripting Framework:</strong> Arquitectura base de scripts, registro y carga de módulos.</li>
+        <li><strong>Boss Encounters:</strong> IA, fases, habilidades y coordinación de jefes de raid.</li>
+        <li><strong>World NPCs:</strong> Comportamientos especiales, seguridad, eventos y servicios para jugadores.</li>
+        <li><strong>Custom Features:</strong> Scripts personalizados, extensiones de servidor y mejoras educativas.</li>
+        <li><strong>Instancias y Mecánicas:</strong> Estado de encuentros, mobs, trash y gestión de instancias.</li>
+      </ul>
+    </section>
+
+    <!-- Información adicional -->
+    <section class="wiki-notes">
+      <h2 class="mb-2">Notas Educativas</h2>
+      <p class="small-muted mb-1">
+        Esta wiki es un recurso para aprender sobre la implementación de servidores privados de WoW, prácticas de scripting, IA de NPCs y diseño de encuentros.
+      </p>
+      <p class="small-muted mb-1">
+        Se recomienda revisar cada sección de la wiki de manera secuencial para comprender la integración entre scripts, eventos, habilidades y la arquitectura del núcleo OlympusCore.
+      </p>
+      <p class="small-muted mb-0">
+        Todos los contenidos reflejan un estudio práctico y educativo; no se promueve la distribución de software con copyright.
+      </p>
+    </section>
+
+      <!-- Descripción general -->
+      <section id="descripcion" class="mb-4">
+        <h2>Descripción general</h2>
+        <p>
+          OlympusCore es un emulador de servidor de <em>World of Warcraft</em> diseñado para la expansión <strong>Cataclysm (parche 4.3.4)</strong>.
+          Basado en <strong>TrinityCore</strong>, ofrece una plataforma completa de servidor de juego capaz de albergar partidas multijugador con mejoras y modificaciones personalizadas.
+        </p>
+        <p>
+          El servidor gestiona las conexiones de los clientes, mantiene el estado del mundo, procesa las acciones de los jugadores y guarda datos persistentes de los personajes usando múltiples bases de datos. OlympusCore soporta las mecánicas completas del juego: progresión de personajes, sistema de hechizos, combate, gremios e instancias.
+        </p>
+      </section>
+
+      <!-- Arquitectura del sistema -->
+      <section id="arquitectura" class="mb-5">
+        <h2>Descripción general de la arquitectura del sistema</h2>
+        <p>
+          OlympusCore sigue una <strong>arquitectura en capas</strong>, con separación clara entre:
+        </p>
+        <ul>
+          <li><strong>Configuration & Scripts</strong> — administración de configuración y sistema de scripts.</li>
+          <li><strong>Persistence Layer</strong> — pools de bases de datos y persistencia.</li>
+          <li><strong>Core Game Systems</strong> — lógica del juego (mundo, sesiones, objetos, hechizos).</li>
+          <li><strong>Application Layer</strong> — punto de entrada, orquestación y servicios.</li>
+        </ul>
+
+<!-- Mermaid: Arquitectura del sistema -->
+<div class="mermaid mb-4">
+graph TD
+  subgraph ApplicationLayer [Application Layer]
+    A1["main() - Entry Point"]
+    A2["Command Line Processing"]
+    A3["Master Class"]
+    A4["Service Orchestration"]
+  end
+
+  subgraph CoreGameSystems [Core Game Systems]
+    C1["World Singleton\nGame State Management"]
+    C2["WorldSession\nClient Connection Handler"]
+    C3["ObjectMgr\nGame Entity Management"]
+    C4["SpellMgr\nMagic System Management"]
+  end
+
+  subgraph Persistence [Persistence Layer]
+    P1["WorldDatabaseWorkerPool\nStatic Game Content"]
+    P2["CharacterDatabaseWorkerPool\nPlayer Data"]
+    P3["LoginDatabaseWorkerPool\nAuthentication"]
+    P4["BlizzDatabaseWorkerPool\nCMS Integration"]
+  end
+
+  A1 --> C1
+  A3 --> C1
+  C1 --> C2
+  C1 --> C3
+  C1 --> C4
+  C1 --> P1
+  C2 --> P2
+  C2 --> P3
+  C4 --> P1
+  P4 --> C1
+</div>
+
+
+        <p class="small-muted">Elementos principales:</p>
+        <pre class="ascii p-2">
+Application Layer
+ ├─ main() Entry Point
+ ├─ Command Line Processing
+ ├─ Master Class
+ └─ Service Orchestration
+
+Core Game Systems
+ ├─ World Singleton (Game State Management)
+ ├─ WorldSession (Client Connection Handler)
+ ├─ ObjectMgr (Game Entity Management)
+ └─ SpellMgr (Magic System Management)
+
+Persistence Layer
+ ├─ WorldDatabaseWorkerPool (Static Game Content)
+ ├─ CharacterDatabaseWorkerPool (Player Data)
+ ├─ LoginDatabaseWorkerPool (Authentication)
+ └─ BlizzDatabaseWorkerPool (CMS Integration)
+        </pre>
+      </section>
+
+      <!-- Arquitectura BD -->
+      <section id="bd" class="mb-5">
+        <h2>Arquitectura de la Base de Datos</h2>
+        <p>
+          El servidor utiliza una arquitectura multi-base de datos para segmentar tipos de datos y responsabilidades.
+        </p>
+
+        <!-- Mermaid: Arquitectura BD -->
+        <div class="mermaid mb-3">
+graph TD
+  DBConn[Database Connections] --> DBPools[Database Worker Pools]
+
+  subgraph Pools [Database Worker Pools]
+    WPool[WorldDatabaseWorkerPool<br/>Static Content Management]
+    CPool[CharacterDatabaseWorkerPool<br/>Player Persistence]
+    LPool[LoginDatabaseWorkerPool<br/>Account Authentication]
+    BPool[BlizzDatabaseWorkerPool<br/>Vote/Donation Points]
+  end
+
+  subgraph DBs [Databases]
+    WDB[World Database<br/>Creatures, Quests, Spells, Items, Loot Tables]
+    CDB[Character Database<br/>Player Characters, Inventory, Progress]
+    LDB[Login Database<br/>Accounts, Realms, Access Control]
+    BDB[BlizzCMS Database<br/>VP/DP Currency, Web Integration]
+  end
+
+  DBPools --> WPool
+  DBPools --> CPool
+  DBPools --> LPool
+  DBPools --> BPool
+
+  WPool --> WDB
+  CPool --> CDB
+  LPool --> LDB
+  BPool --> BDB
+        </div>
+
+        <pre class="ascii p-2">
+Database Connections
+ └─ Database Worker Pools
+     ├─ WorldDatabaseWorkerPool (Static Content Management)
+     ├─ CharacterDatabaseWorkerPool (Player Persistence)
+     ├─ LoginDatabaseWorkerPool (Account Authentication)
+     └─ BlizzDatabaseWorkerPool (Vote/Donation Points)
+
+Databases
+ ├─ World Database
+ │   ├─ Creatures, Quests, Spells
+ │   └─ Items, Loot Tables
+ ├─ Character Database
+ │   ├─ Player Characters
+ │   └─ Inventory, Progress
+ ├─ Login Database
+ │   ├─ Accounts, Realms
+ │   └─ Access Control
+ └─ BlizzCMS Database
+     ├─ VP/DP Currency
+     └─ Web Integration
+        </pre>
+      </section>
+
+      <!-- Componentes clave -->
+      <section id="componentes" class="mb-5">
+        <h2>Componentes clave</h2>
+        <p>Lista de los componentes más importantes del sistema, con su propósito y clases/clasificaciones principales.</p>
+
+        <div class="table-responsive">
+          <table class="table table-dark table-striped">
+            <thead>
+              <tr>
+                <th>Componente</th>
+                <th>Propósito</th>
+                <th>Clases / Referencias</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Application Entry</td>
+                <td>Inicio del servidor y ciclo de vida.</td>
+                <td><code>main()</code>, <code>Master</code></td>
+              </tr>
+              <tr>
+                <td>World Management</td>
+                <td>Coordinación del estado global y sesiones.</td>
+                <td><code>World</code>, <code>WorldSession</code></td>
+              </tr>
+              <tr>
+                <td>Database Layer</td>
+                <td>Persistencia multi-base de datos y pooling.</td>
+                <td><code>*DatabaseWorkerPool</code>, <code>*DatabaseConnection</code></td>
+              </tr>
+              <tr>
+                <td>Configuration</td>
+                <td>Gestión de parámetros y configuración.</td>
+                <td><code>sConfigMgr</code>, <code>worldserver.conf</code></td>
+              </tr>
+              <tr>
+                <td>Scripting</td>
+                <td>Contenido personalizado y mejoras a través de scripts.</td>
+                <td><code>ScriptMgr</code>, <code>AddSC_*</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Características -->
+      <section id="features" class="mb-5">
+        <h2>Características del servidor</h2>
+        <p>OlympusCore extiende TrinityCore con varias mejoras propias que uso en mi servidor:</p>
+        <ul>
+          <li><strong>Sistema de XP dinámico:</strong> multiplicadores de experiencia por horarios (CONFIG_XP_BOOST_DAYMASK).</li>
+          <li><strong>Progresión de títulos PvP:</strong> recompensas automáticas por kills honorables.</li>
+          <li><strong>Reset de duelos:</strong> restauración de cooldowns y recursos tras duelos.</li>
+          <li><strong>Integración con BlizzCMS:</strong> gestión de votos (VP) y puntos de donación (DP) mediante base de datos dedicada.</li>
+          <li><strong>Configuración avanzada:</strong> múltiples opciones y ajustes en <code>worldserver.conf</code>.</li>
+        </ul>
+
+        <p class="small-muted">Ejemplos de scripts relacionados:</p>
+        <ul class="small-muted">
+          <li><code>src/server/scripts/World/boosted_xp.cpp</code> (sistema XP dinámico)</li>
+          <li><code>src/server/scripts/World/system_pvptitles.cpp</code> (títulos PvP)</li>
+          <li><code>src/server/scripts/World/duel_reset.cpp</code> (reset de duelos)</li>
+        </ul>
+      </section>
+
+      <!-- Build y despliegue -->
+      <section id="build" class="mb-5">
+  <h2>Sistema de construcción y dependencias</h2>
+  <p><strong>OlympusCore</strong> utiliza <strong>CMake</strong> para compilación multiplataforma con dependencias en:</p>
+  <ul>
+    <li><strong>Bibliotecas Boost:</strong> Versión 1.67+ (Linux) o 1.78+ (Windows) para utilidades del sistema</li>
+    <li><strong>OpenSSL:</strong> Funciones criptográficas y comunicaciones seguras</li>
+    <li><strong>MySQL:</strong> Conectividad de base de datos y funcionalidad ORM</li>
+    <li><strong>ACE Framework:</strong> Programación de red y primitivas de multihilo</li>
+  </ul>
+
+  <p>
+    La integración de Boost está configurada en 
+    <code>dep/boost/CMakeLists.txt:12-61</code> con definiciones de compilación específicas para un rendimiento óptimo.
+  </p>
+
+  <h5>Entorno de desarrollo</h5>
+
+  <h6>Entorno Windows</h6>
+  <ul>
+    <li>Windows 10/11</li>
+    <li>Visual Studio 2017 o superior</li>
+    <li>OpenSSL 1.1.1 / 3.x</li>
+    <li>MySQL 5.7 / 8.x</li>
+    <li>CMake 3.8+</li>
+    <li>Boost 1.78</li>
+  </ul>
+
+  <h6>Entorno Linux (Debian 10/11)</h6>
+  <ul>
+    <li>GCC 7.4.0 / 10.2.1 o Clang 6.0.0 / 11.0.1</li>
+    <li>OpenSSL 1.1.1 / 3.x</li>
+    <li>MySQL 5.7 / 8.x</li>
+    <li>CMake 3.8+</li>
+    <li>Boost 1.67 / 1.74</li>
+  </ul>
+
+  <h5>Requisitos de datos del juego</h5>
+  <p>El servidor requiere datos extraídos del cliente del juego:</p>
+  <ul>
+    <li><strong>MMAPS:</strong> Datos de mallas de navegación para el pathfinding</li>
+    <li><strong>DBC:</strong> Archivos de cliente que contienen reglas y constantes del juego</li>
+    <li><strong>VMAPS:</strong> Mapas de visibilidad para cálculos de línea de visión</li>
+    <li><strong>MAPS:</strong> Mapas de terreno y alturas para validación de movimiento</li>
+  </ul>
+</section>
+
+      <!-- Fuentes -->
+      <section id="fuentes" class="mb-4">
+        <h2>Fuentes</h2>
+        <p class="sources">
+          Fragmentos y referencias extraídas de mi árbol de código y archivos de configuración:
+        </p>
+        <ul class="sources">
+          <li><code>src/server/worldserver/Main.cpp</code> (líneas: 74–158)</li>
+          <li><code>src/server/worldserver/Master.cpp</code> (líneas: 114–364, 367–488)</li>
+          <li><code>src/server/game/World/World.h</code> (líneas: 103–433, 649–715)</li>
+          <li><code>src/server/shared/Database/Implementation/BlizzDatabase.h</code> (líneas: 17–37)</li>
+          <li><code>src/server/shared/Database/DatabaseEnv.h</code> (líneas: 42–46)</li>
+          <li><code>src/server/scripts/World/boosted_xp.cpp</code>, <code>system_pvptitles.cpp</code>, <code>duel_reset.cpp</code></li>
+          <li><code>CMakeLists.txt</code>, <code>README</code></li>
+        </ul>
+      </section>
+
+	  <section id="server-architecture" class="mb-5">
+  <h2>Arquitectura del servidor</h2>
+  <p>
+    <strong>OlympusCore</strong> implementa una arquitectura distribuida de servidor privado de World of Warcraft
+    compuesta por dos aplicaciones principales: <code>worldserver</code> y <code>authserver</code>.
+    Este documento ofrece una visión general de la infraestructura del servidor, las relaciones entre componentes y la organización del sistema.
+  </p>
+  <p>
+    La arquitectura sigue el principio de separación de responsabilidades:
+    <code>authserver</code> maneja la autenticación y la gestión de reinos, mientras que
+    <code>worldserver</code> administra el mundo del juego, las sesiones de jugadores y las mecánicas de jugabilidad.
+    Ambas aplicaciones comparten infraestructura común para la conectividad de base de datos, la gestión de configuración y el manejo de hilos.
+  </p>
+
+  <h5>Arquitectura general del sistema</h5>
+  <p>
+    OlympusCore implementa una arquitectura de doble servidor donde <code>authserver</code> y
+    <code>worldserver</code> operan como procesos separados con responsabilidades distintas.
+    El sistema utiliza bases de datos MySQL para la persistencia y soporta operación multi-hilo para escalabilidad.
+  </p>
+
+  <h6>Resumen de arquitectura de doble servidor</h6>
+  <ul>
+    <li><strong>Configuración:</strong> <code>authserver.conf</code>, <code>worldserver.conf</code></li>
+    <li><strong>Capa de base de datos:</strong> <code>LoginDatabase</code>, <code>WorldDatabase</code>, <code>CharacterDatabase</code>, <code>BlizzDatabase</code></li>
+    <li><strong>World Server:</strong> <code>main()</code>, <code>Master</code>, <code>WorldServerSignalHandler</code>, <code>sWorld</code>, <code>sWorldSocketMgr</code></li>
+    <li><strong>Auth Server:</strong> <code>main()</code>, <code>AuthServerSignalHandler</code>, <code>RealmAcceptor</code>, <code>sRealmList</code></li>
+    <li><strong>Cliente WoW:</strong> Conexiones de login/autenticación y tráfico de juego</li>
+  </ul>
+
+  <h5>Puntos de entrada de la aplicación</h5>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Aplicación</th>
+        <th>Punto de entrada</th>
+        <th>Configuración</th>
+        <th>Clase principal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>authserver</td>
+        <td><code>main()</code></td>
+        <td><code>authserver.conf</code></td>
+        <td><code>RealmAcceptor</code></td>
+      </tr>
+      <tr>
+        <td>worldserver</td>
+        <td><code>main()</code></td>
+        <td><code>worldserver.conf</code></td>
+        <td><code>Master</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h5>Componentes de infraestructura clave</h5>
+  <ul>
+    <li><strong>Gestión de configuración:</strong> <code>sConfigMgr</code>, <code>authserver.conf</code>, <code>worldserver.conf</code></li>
+    <li><strong>Gestión de red:</strong> <code>sWorldSocketMgr</code>, <code>WorldSocket</code>, <code>RealmAcceptor</code></li>
+    <li><strong>Núcleo del juego:</strong> <code>Master</code>, <code>sWorld</code></li>
+    <li><strong>Autenticación:</strong> <code>sRealmList</code></li>
+    <li><strong>Bases de datos:</strong> Worker Pools para World, Characters, Login y BlizzCMS</li>
+  </ul>
+
+  <h5>Responsabilidades de los componentes</h5>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Componente</th>
+        <th>Tipo</th>
+        <th>Responsabilidad</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Master</td>
+        <td>Aplicación</td>
+        <td>Gestión del ciclo de vida, orquestación de hilos</td>
+      </tr>
+      <tr>
+        <td>sWorld</td>
+        <td>Núcleo del juego</td>
+        <td>Estado del juego, gestión de sesiones, bucle de actualización</td>
+      </tr>
+      <tr>
+        <td>sConfigMgr</td>
+        <td>Infraestructura</td>
+        <td>Carga y acceso a configuración</td>
+      </tr>
+      <tr>
+        <td>sWorldSocketMgr</td>
+        <td>Red</td>
+        <td>Gestión de conexiones de clientes</td>
+      </tr>
+      <tr>
+        <td>sRealmList</td>
+        <td>Autenticación</td>
+        <td>Mantenimiento de la lista de reinos</td>
+      </tr>
+      <tr>
+        <td>Database Worker Pools</td>
+        <td>Datos</td>
+        <td>Operaciones asíncronas de base de datos</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h5>Arquitectura de hilos y concurrencia</h5>
+  <p>
+    Ambos servidores implementan arquitecturas multi-hilo para manejar operaciones concurrentes.
+    <code>worldserver</code> utiliza un modelo más complejo debido a sus requisitos de procesamiento en tiempo real.
+  </p>
+  <ul>
+    <li><strong>WorldRunnable:</strong> Prioridad más alta, ejecuta el bucle principal del juego</li>
+    <li><strong>CliRunnable:</strong> Prioridad normal, procesamiento de comandos de consola</li>
+    <li><strong>RARunnable:</strong> Prioridad normal, administración remota</li>
+    <li><strong>TCSoapRunnable:</strong> Prioridad normal, servicios web SOAP</li>
+    <li><strong>FreezeDetectorRunnable:</strong> Prioridad más alta, detección de bloqueos</li>
+  </ul>
+
+  <h5>Manejo de señales y gestión de servicios</h5>
+  <p>
+    Ambos servidores implementan un sistema completo de manejo de señales para apagados seguros
+    y capacidades de gestión de servicios, especialmente importantes en entornos de producción.
+  </p>
+  <ul>
+    <li><strong>Señales soportadas:</strong> SIGINT, SIGTERM, SIGBREAK (Windows)</li>
+    <li><strong>Acciones de apagado:</strong> <code>World::StopNow()</code>, limpieza de hilos y salida de procesos</li>
+    <li><strong>Soporte de servicios Windows:</strong> Instalación, ejecución y desinstalación (solo en worldserver)</li>
+    <li><strong>PID Files:</strong> Soportados en ambos servidores</li>
+  </ul>
+</section>
+
+<section id="application-entry" class="mb-5">
+  <h2>Punto de Entrada de la Aplicación y Gestión de Servicios</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Esta sección cubre los puntos de entrada principales para los ejecutables <code>worldserver</code> y <code>authserver</code>, su gestión del ciclo de vida de servicios, arquitectura de hilos y manejo de señales. Para más detalles sobre el sistema World y el bucle de juego, ver <em>World System and Configuration</em>. Para la gestión de conexiones de base de datos, ver <em>Database Layer and Object Management</em>.</p>
+
+  <h3>Visión General</h3>
+  <p>OlympusCore consiste en dos aplicaciones de servidor principales que manejan diferentes aspectos de un servidor privado de World of Warcraft:</p>
+  <ul>
+    <li><strong>worldserver:</strong> Servidor principal del mundo que gestiona sesiones de jugadores, lógica de juego y simulación del mundo.</li>
+    <li><strong>authserver:</strong> Servidor de autenticación que maneja inicio de sesión, listas de reinos y validación de cuentas.</li>
+  </ul>
+  <p>Ambas aplicaciones siguen patrones similares para inicialización, carga de configuración y gestión de servicios, pero difieren en arquitectura de ejecución e hilos.</p>
+
+  <h3>Puntos de Entrada de la Aplicación</h3>
+  <h4>Worldserver</h4>
+  <p>Se inicia en <code>src/server/worldserver/Main.cpp</code> (líneas 80-170). Secuencia de inicio:</p>
+  <ol>
+    <li>main()</li>
+    <li>Analizar argumentos de línea de comandos</li>
+    <li>Cargar <code>worldserver.conf</code></li>
+    <li>Mostrar banner</li>
+    <li>Crear y ejecutar instancia Master</li>
+    <li>Retornar código de salida</li>
+  </ol>
+  <p><strong>Operaciones de servicio en Windows:</strong> instalar/desinstalar servicio, ejecutar como servicio.</p>
+  <p><strong>Argumentos soportados:</strong></p>
+  <ul>
+    <li>-c config_file → especificar archivo de configuración</li>
+    <li>-s install/uninstall → instalar o eliminar servicio (Windows)</li>
+    <li>--service → ejecutar como servicio (Windows)</li>
+  </ul>
+
+  <h4>Authserver</h4>
+  <p>Se inicia en <code>src/server/authserver/Main.cpp</code> (líneas 84-250). Secuencia de inicio:</p>
+  <ol>
+    <li>main()</li>
+    <li>Analizar argumentos de línea de comandos</li>
+    <li>Cargar <code>authserver.conf</code></li>
+    <li>Mostrar banner</li>
+    <li>Inicializar ACE Reactor</li>
+    <li>Inicializar base de datos</li>
+    <li>Cargar lista de reinos</li>
+    <li>Iniciar Network Acceptor</li>
+    <li>Ejecutar Reactor Event Loop</li>
+    <li>Apagado y limpieza</li>
+  </ol>
+
+  <h3>Arquitectura de Gestión de Servicios</h3>
+  <h4>Ciclo de Vida de la Clase Master (worldserver)</h4>
+  <ul>
+    <li>Configuración OpenSSL & Crypto</li>
+    <li>Crear archivo PID</li>
+    <li>Inicializar bases de datos</li>
+    <li>Inicializar configuración del mundo</li>
+    <li>Configurar manejadores de señales</li>
+    <li>Lanzar hilos de servicio</li>
+    <li>Iniciar servicios de red</li>
+    <li>Marcar servidor como listo</li>
+    <li>Esperar señal de apagado</li>
+    <li>Limpieza y cierre de bases de datos</li>
+  </ul>
+  <p><strong>Hilos principales:</strong> WorldRunnable, CliRunnable, RARunnable, TCSoapRunnable, FreezeDetectorRunnable</p>
+
+  <h3>Inicialización de Base de Datos</h3>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Servidor</th>
+        <th>Bases de Datos</th>
+        <th>Claves de Configuración</th>
+        <th>Hilos de Trabajo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>worldserver</td>
+        <td>World, Character, Login, Blizz</td>
+        <td>WorldDatabaseInfo, CharacterDatabaseInfo, LoginDatabaseInfo, BlizzDatabaseInfo</td>
+        <td>Configurable por base de datos</td>
+      </tr>
+      <tr>
+        <td>authserver</td>
+        <td>Login</td>
+        <td>LoginDatabaseInfo</td>
+        <td>Monohilo</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Gestión de Hilos</h3>
+  <h4>Modelo Worldserver</h4>
+  <ul>
+    <li>Arquitectura multihilo con cada servicio en su propio hilo</li>
+    <li>Prioridad más alta para World y FreezeDetector</li>
+    <li>Hilos CLI y SOAP creados según configuración</li>
+  </ul>
+
+  <h4>Modelo Authserver</h4>
+  <ul>
+    <li>Monohilo basado en ACE Reactor</li>
+    <li>Hilo principal ejecuta Event Loop</li>
+    <li>RealmAcceptor gestiona conexiones entrantes</li>
+    <li>Manejo de eventos y ping periódico a base de datos</li>
+  </ul>
+
+  <h3>Manejo de Señales y Apagado</h3>
+  <h4>Secuencia de Apagado</h4>
+  <p><strong>Worldserver:</strong></p>
+  <ul>
+    <li>Señal procesada por WorldServerSignalHandler</li>
+    <li>Llamada a World::StopNow()</li>
+    <li>Hilo de mundo detiene bucle de juego y limpia</li>
+    <li>Master espera cierre de hilos</li>
+    <li>Cierre de bases de datos</li>
+    <li>Salida con código de estado</li>
+  </ul>
+  <p><strong>Authserver:</strong></p>
+  <ul>
+    <li>Señal activa stopEvent = true</li>
+    <li>Event Loop finaliza</li>
+    <li>Cierre de base de datos</li>
+    <li>Proceso finaliza normalmente</li>
+  </ul>
+
+  <h3>Configuración y Sistema de Banner</h3>
+  <p>Ambos servidores usan <code>olympus::Banner</code> para mostrar:</p>
+  <ul>
+    <li>ASCII Art de OlympusCore</li>
+    <li>Nombre y versión de la aplicación</li>
+    <li>Ruta de configuración</li>
+    <li>Versiones de dependencias (OpenSSL, ACE, Boost)</li>
+  </ul>
+
+  <h3>Características Específicas de Plataforma</h3>
+  <h4>Soporte de Servicio en Windows</h4>
+  <ul>
+    <li>Service Name: worldserver</li>
+    <li>Display Name: TrinityCore world service</li>
+    <li>Description: Emulador TrinityCore de World of Warcraft (world service)</li>
+  </ul>
+
+  <h4>Afinidad y Prioridad de Procesos</h4>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Configuración</th>
+        <th>Clave</th>
+        <th>Propósito</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Process Affinity</td>
+        <td>UseProcessors</td>
+        <td>Asignación de cores vía bitmask</td>
+      </tr>
+      <tr>
+        <td>Process Priority</td>
+        <td>ProcessPriority</td>
+        <td>Establecer HIGH_PRIORITY_CLASS</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="world-system" class="mb-5">
+  <h2>World System y Configuración</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Esta sección explica el sistema singleton <code>World</code>, que actúa como coordinador central de operaciones del servidor, gestión de configuración, manejo de sesiones y temporización del bucle de juego. La clase <code>World</code> administra el estado principal del servidor, sesiones de jugadores y comportamientos definidos por configuración.</p>
+
+  <h3>Arquitectura Singleton World</h3>
+  <p>La clase <code>World</code> implementa un patrón singleton y sirve como punto central de coordinación para todas las operaciones del servidor:</p>
+  <ul>
+    <li><strong>Estado global:</strong> manejo del estado del servidor, incluyendo número de jugadores, estado de apagado y flags operativos</li>
+    <li><strong>Gestión de sesiones:</strong> administra todas las sesiones activas y colas de espera</li>
+    <li><strong>Integración de configuración:</strong> carga y proporciona acceso a todas las configuraciones del servidor</li>
+    <li><strong>Orquestación de temporizadores:</strong> coordina intervalos de actualización de mapas, clima, eventos y sistemas periódicos</li>
+    <li><strong>Gestión de rates:</strong> aplica multiplicadores configurables de experiencia, drops, reputación y otras mecánicas de juego</li>
+  </ul>
+
+  <h3>Gestión de Configuración</h3>
+  <p>El sistema <code>World</code> implementa un marco completo de configuración que carga ajustes desde <code>worldserver.conf</code> y los hace disponibles globalmente:</p>
+
+  <h4>Estructura del Archivo de Configuración</h4>
+  <ul>
+    <li><strong>CONNECTIONS AND DIRECTORIES:</strong> RealmID, DataDir, conexiones a base de datos</li>
+    <li><strong>PERFORMANCE SETTINGS:</strong> UseProcessors, Compression, PlayerLimit</li>
+    <li><strong>SERVER LOGGING:</strong> PidFile, PacketLogFile, ChatLogs</li>
+    <li><strong>SERVER SETTINGS:</strong> GameType, RealmZone, MaxPlayerLevel</li>
+    <li><strong>WARDEN SETTINGS:</strong> Warden.Enabled, Warden.NumMemChecks</li>
+    <li><strong>PLAYER INTERACTION:</strong> AllowTwoSide.*, TalentsInspecting</li>
+    <li><strong>CREATURE SETTINGS:</strong> ThreatRadius, Rate.Creature.*</li>
+    <li><strong>CHAT SETTINGS:</strong> ChatFlood.*, Channel.RestrictedLfg</li>
+  </ul>
+
+  <h4>Carga y Validación de Configuración</h4>
+  <p>El método <code>World::LoadConfigSettings()</code> realiza validaciones extensas, incluyendo rango de valores, dependencias y logging de errores, aplicando valores por defecto en caso de configuración inválida.</p>
+
+  <h4>Categorías Principales de Configuración</h4>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Categoría</th>
+        <th>Claves de Configuración</th>
+        <th>Propósito</th>
+        <th>Ejemplos</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Base de Datos & Core</td>
+        <td>LoginDatabaseInfo, RealmID, DataDir</td>
+        <td>Identidad del servidor y almacenamiento de datos</td>
+        <td>Conexiones a bases, identificación del reino</td>
+      </tr>
+      <tr>
+        <td>Performance</td>
+        <td>PlayerLimit, Compression, GridUnload</td>
+        <td>Optimización de servidor</td>
+        <td>Capacidad de jugadores, manejo de memoria</td>
+      </tr>
+      <tr>
+        <td>Game Mechanics</td>
+        <td>MaxPlayerLevel, StartPlayerLevel, Expansion</td>
+        <td>Parámetros centrales de juego</td>
+        <td>Límites de nivel, condiciones de inicio</td>
+      </tr>
+      <tr>
+        <td>Player Interaction</td>
+        <td>AllowTwoSide.*, TalentsInspecting</td>
+        <td>Funciones sociales y cross-facción</td>
+        <td>Restricciones de facción, inspección de talentos</td>
+      </tr>
+      <tr>
+        <td>Creature Behavior</td>
+        <td>ThreatRadius, Rate.Creature.*</td>
+        <td>Mecánicas de NPC y criaturas</td>
+        <td>Radio de aggro, estadísticas de criaturas</td>
+      </tr>
+      <tr>
+        <td>Chat & Communication</td>
+        <td>ChatFlood.*, ChatLevelReq.*</td>
+        <td>Control del chat</td>
+        <td>Protección de spam, nivel requerido</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Gestión de Sesiones</h3>
+  <p>El sistema <code>World</code> gestiona todas las conexiones de jugadores mediante un marco que controla ciclo de vida de sesiones, límites de capacidad, colas y tolerancia a desconexiones recientes.</p>
+
+  <h4>Flujo de Procesamiento de Sesiones</h4>
+  <ul>
+    <li>Reciente desconexión → bypass de cola</li>
+    <li>Verificación de límite de jugadores</li>
+    <li>Cola de espera para exceso de jugadores</li>
+    <li>Activación de sesión</li>
+  </ul>
+
+  <h4>Estadísticas de Sesiones</h4>
+  <ul>
+    <li>Sesiones activas: <code>GetActiveSessionCount()</code></li>
+    <li>Sesiones en cola: <code>GetQueuedSessionCount()</code></li>
+    <li>Pico histórico activo: <code>m_maxActiveSessionCount</code></li>
+    <li>Pico histórico en cola: <code>m_maxQueuedSessionCount</code></li>
+    <li>Total de sesiones: <code>GetActiveAndQueuedSessionCount()</code></li>
+  </ul>
+
+  <h3>Bucle de Juego y Sistema de Temporización</h3>
+  <p>El sistema <code>World</code> coordina temporizadores para todos los subsistemas mediante <code>IntervalTimer</code> y <code>WorldTimers</code>, gestionando actualizaciones de mapas, eventos periódicos y mantenimiento.</p>
+
+  <h4>Temporizadores Críticos de Rendimiento</h4>
+  <ul>
+    <li>Map Updates: <code>MapUpdateInterval</code> (default 100ms)</li>
+    <li>Grid Cleanup: <code>GridCleanUpDelay</code> (default 5 min)</li>
+    <li>Weather Changes: <code>ChangeWeatherInterval</code> (10 min)</li>
+    <li>Player Saves: <code>PlayerSaveInterval</code> (15 min)</li>
+    <li>Database Ping: <code>MaxPingTime</code> (30 min)</li>
+  </ul>
+
+  <h3>Características Configurables de Juego</h3>
+  <p>El sistema permite funcionalidades configurables:</p>
+  <ul>
+    <li><strong>Boost de Experiencia:</strong> Multiplicadores según día y hora (<code>XP.Boost.Daymask</code>, <code>RATE_XP_BOOST</code>)</li>
+    <li><strong>Bono PvP:</strong> Bonus de experiencia por kills PvP (<code>RATE_BONUS_XP_PVP_VALUE</code>)</li>
+    <li><strong>Bono de Mazmorras:</strong> Bonus de experiencia por completar dungeons (<code>RATE_BONUS_XP_DUNGEON_VALUE</code>)</li>
+    <li><strong>Títulos opcionales:</strong> Remoción de requisitos de logros (<code>CONFIG_BONUS_TITLE_REQUIREMENT</code>)</li>
+  </ul>
+</section>
+
+<section id="database-layer" class="mb-5">
+  <h2>Database Layer y Gestión de Objetos</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Esta sección cubre la capa de integración de base de datos y el sistema de gestión de objetos en OlympusCore, proporcionando almacenamiento persistente para entidades del juego, gestión de plantillas y manejo del ciclo de vida de los objetos.</p>
+
+  <h3>Propósito y Arquitectura del Sistema</h3>
+  <p>La capa de base de datos es la base para todos los datos persistentes del juego, ofreciendo caching, gestión de plantillas y asignación de GUID para entidades del juego. Está construida sobre tres bases de datos principales:</p>
+  <ul>
+    <li><strong>WorldDatabase:</strong> datos estáticos del juego</li>
+    <li><strong>CharacterDatabase:</strong> datos de jugadores</li>
+    <li><strong>LoginDatabase:</strong> autenticación</li>
+  </ul>
+
+  <h3>ObjectMgr - Funcionalidad Principal</h3>
+  <p>La clase <code>ObjectMgr</code> es el hub central para la gestión de datos estáticos del juego, proporcionando métodos de acceso, caching y soporte de localización.</p>
+  <ul>
+    <li>Almacenes de plantillas: <code>CreatureTemplate</code>, <code>CreatureAddon</code>, <code>EquipmentInfo</code>, <code>CreatureModelInfo</code></li>
+    <li>Contadores GUID: <code>_hiCreatureGuid</code>, <code>_hiItemGuid</code>, <code>_hiCharGuid</code>, etc.</li>
+    <li>Métodos de carga: <code>LoadCreatureTemplates()</code>, <code>LoadCreatureAddons()</code>, <code>LoadEquipmentTemplates()</code></li>
+    <li>Arreglos de información de jugadores: <code>_playerInfo[race][class]</code></li>
+  </ul>
+
+  <h3>Carga y Validación de Plantillas</h3>
+  <p>El <code>ObjectMgr</code> carga plantillas de datos estáticos durante el inicio del servidor con validación exhaustiva:</p>
+  <ul>
+    <li><strong>CreatureTemplate:</strong> <code>creature_template</code> → <code>_creatureTemplateStore</code></li>
+    <li><strong>CreatureAddon:</strong> <code>creature_template_addon</code> → <code>_creatureTemplateAddonStore</code></li>
+    <li><strong>EquipmentInfo:</strong> <code>creature_equip_template</code> → <code>_equipmentInfoStore</code></li>
+    <li><strong>CreatureModelInfo:</strong> <code>creature_model_info</code> → <code>_creatureModelStore</code></li>
+  </ul>
+
+  <h3>Gestión de GUIDs</h3>
+  <p>Se mantienen contadores únicos para todas las entidades del juego, asegurando que no haya conflictos durante la creación de objetos:</p>
+  <ul>
+    <li>_hiCharGuid, _hiCreatureGuid, _hiItemGuid, _hiGoGuid, _hiPetGuid, _hiVehicleGuid, _hiDoGuid, _hiCorpseGuid, _hiMoTransGuid</li>
+    <li>Métodos: <code>GenerateNewGuid()</code>, <code>MAKE_NEW_GUID()</code></li>
+  </ul>
+
+  <h3>Capa de Abstracción de Base de Datos</h3>
+  <p>Se utilizan <strong>Prepared Statements</strong> para operaciones seguras y eficientes, manteniendo separación entre datos de mundo y de personajes.</p>
+  <ul>
+    <li><strong>WorldDatabaseConnection:</strong> <code>DoPrepareStatements()</code> para datos de mundo</li>
+    <li><strong>CharacterDatabaseConnection:</strong> <code>DoPrepareStatements()</code> para datos de personajes</li>
+    <li><strong>Tipos de operaciones:</strong> Template Loading, Entity Management, Player Data, Guild System, Achievement System</li>
+  </ul>
+
+  <h3>Soporte de Localización</h3>
+  <p>El <code>ObjectMgr</code> soporta múltiples idiomas para el contenido textual visible por el jugador:</p>
+  <ul>
+    <li>Locales: enUS, deDE, frFR, etc. (hasta 8 idiomas)</li>
+    <li>Almacenes: <code>_creatureLocaleStore</code>, <code>_gossipMenuItemsLocaleStore</code>, <code>_pointOfInterestLocaleStore</code></li>
+    <li>Métodos: <code>AddLocaleString()</code>, <code>GetLocaleString()</code></li>
+  </ul>
+
+  <h3>Creación de Objetos y Resolución de Plantillas</h3>
+  <p>El <code>ObjectMgr</code> proporciona métodos para crear objetos del juego desde plantillas, manejando selección de display, flags y randomización de modelos:</p>
+  <ul>
+    <li>Métodos principales: <code>GetCreatureTemplate(entry)</code>, <code>ChooseCreatureFlags()</code>, <code>ChooseDisplayId()</code>, <code>GetCreatureModelRandomGender()</code></li>
+    <li>Flujo de creación: <code>Creature::Create()</code> → <code>LoadFromDB()</code> → <code>LoadCreatureAddon()</code></li>
+    <li>Soporte de herencia de plantillas y randomización de género en modelos alternativos</li>
+  </ul>
+</section>
+
+<section id="build-system" class="mb-5">
+  <h2>Build System y Dependencias</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Esta sección cubre el sistema de compilación basado en CMake de OlympusCore, incluyendo la gestión de dependencias externas, compilación de objetivos y configuraciones específicas por plataforma.</p>
+
+  <h3>Visión General del Sistema de Compilación</h3>
+  <p>OlympusCore utiliza <strong>CMake</strong> como sistema principal de construcción (versión mínima requerida 3.8), organizado en múltiples bibliotecas y ejecutables que forman el servidor completo.</p>
+
+  <h3>Estructura del Proyecto CMake</h3>
+  <ul>
+    <li><code>CMakeLists.txt</code>: Configuración raíz del proyecto OlympusCore</li>
+    <li><code>cmake/options.cmake</code>: Configuración de opciones de compilación</li>
+    <li><code>cmake/genrev.cmake</code>: Generación de información de revisión</li>
+    <li><code>dep/CMakeLists.txt</code>: Gestión de dependencias externas</li>
+    <li><code>cmake/macros/FindMySQL.cmake</code>: Detección de MySQL/MariaDB</li>
+    <li><code>src/CMakeLists.txt</code>: Raíz de código fuente</li>
+    <li><code>src/server/authserver/CMakeLists.txt</code>: Ejecutable authserver</li>
+    <li><code>src/server/worldserver/CMakeLists.txt</code>: Ejecutable worldserver</li>
+    <li><code>src/server/game/CMakeLists.txt</code>: Librería de lógica de juego</li>
+    <li><code>src/server/scripts/CMakeLists.txt</code>: Librería de scripts</li>
+    <li><code>src/server/shared/CMakeLists.txt</code>: Librería compartida</li>
+    <li><code>src/server/collision/CMakeLists.txt</code>: Librería de colisiones</li>
+  </ul>
+
+  <h3>Dependencias Externas</h3>
+  <p>El sistema de compilación gestiona varias dependencias críticas:</p>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Dependencia</th>
+        <th>Propósito</th>
+        <th>Método de Detección</th>
+        <th>Requerido</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>ACE</td><td>Redes y threading</td><td>find_package(ACE REQUIRED)</td><td>Sí</td></tr>
+      <tr><td>OpenSSL</td><td>Operaciones criptográficas</td><td>find_package(OpenSSL REQUIRED)</td><td>Sí</td></tr>
+      <tr><td>MySQL/MariaDB</td><td>Conectividad de base de datos</td><td>FindMySQL.cmake</td><td>Sí</td></tr>
+      <tr><td>Boost</td><td>Utilidades de sistema y algoritmos</td><td>find_package(Boost COMPONENTS ...)</td><td>Sí</td></tr>
+      <tr><td>Threads</td><td>Soporte multi-threading</td><td>find_package(Threads REQUIRED)</td><td>Unix solo</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Detección de MySQL/MariaDB</h3>
+  <p>Soporta tanto MySQL como MariaDB en diferentes plataformas:</p>
+  <ul>
+    <li>Windows: busca MariaDB 10.5-10.9 en rutas estándar de Program Files</li>
+    <li>Unix: usa <code>mysql_config</code> si está disponible, o rutas estándar del sistema</li>
+  </ul>
+
+  <h3>Configuración y Opciones de Compilación</h3>
+  <ul>
+    <li>Tipo de compilación por defecto: <code>Release</code></li>
+    <li>Protección contra cambios de código fuente y compilación in-source</li>
+    <li>Control de precompiled headers (<code>USE_COREPCH</code>, <code>USE_SCRIPTPCH</code>)</li>
+  </ul>
+
+  <h3>Generación de Información de Revisión</h3>
+  <p>Se genera automáticamente un header <code>revision_data.h</code> con metadatos del build:</p>
+  <ul>
+    <li><code>_REVISION, _HASH, _DATE, _BRANCH</code></li>
+    <li><code>VER_COMPANYNAME_STR</code> y <code>VER_LEGALCOPYRIGHT_STR</code></li>
+  </ul>
+
+  <h3>Objetivos Principales y Librerías</h3>
+  <ul>
+    <li>Librerías: <code>shared</code>, <code>game</code>, <code>collision</code>, <code>scripts</code></li>
+    <li>Ejecutables: <code>authserver</code>, <code>worldserver</code></li>
+  </ul>
+
+  <h3>Compilación de Scripts</h3>
+  <p>Macro dinámica que recopila fuentes de múltiples directorios:</p>
+  <pre><code>macro(PrepareScripts name out)
+  file(GLOB_RECURSE found ${name}/*.h ${name}/*.cpp)
+  list(APPEND ${out} ${found})
+endmacro()</code></pre>
+
+  <h3>Rutas de Inclusión</h3>
+  <ul>
+    <li><strong>authserver:</strong> Authentication/, Realms/, Server/</li>
+    <li><strong>game:</strong> Entities/, Spells/, AI/, Handlers/</li>
+    <li><strong>scripts:</strong> Todas las includes de juego + scripts</li>
+    <li><strong>collision:</strong> Management/, Maps/, Models/</li>
+  </ul>
+
+  <h3>Configuraciones por Plataforma</h3>
+  <p>El build system maneja diferencias entre Windows y Unix mediante compilación condicional:</p>
+  <ul>
+    <li><strong>Windows:</strong> incluye archivos de recursos, copia post-build de <code>authserver.conf.dist</code></li>
+    <li><strong>Unix:</strong> enlaza con librerías externas (MySQL, OpenSSL, ACE, Boost) y define rutas de configuración</li>
+  </ul>
+
+  <h3>Control de Compilación de Dependencias</h3>
+  <ul>
+    <li>Dependencias comunes: ACE, Boost, MySQL/MariaDB</li>
+    <li>Linux: readline, zlib, bzip2, threads</li>
+    <li>Windows: dependencias integradas</li>
+    <li>Opcionales según configuración: jemalloc, g3dlite, recastnavigation, gsoap, StormLib, json, etc.</li>
+  </ul>
+</section>
+
+<section id="core-entities" class="mb-5">
+  <h2>Core Game Entity System</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Esta sección describe la jerarquía de entidades y los sistemas de gestión que sustentan todos los objetos de juego en OlympusCore, incluyendo <code>Object</code>, <code>WorldObject</code>, el sistema de tipos, gestión de ciclo de vida, sincronización de valores y gestión espacial en grids.</p>
+
+  <h3>Jerarquía de Tipos de Entidad</h3>
+  <p>El sistema de entidades se construye con una estructura de clases jerárquica, donde <code>Object</code> es la clase base de todas las entidades.</p>
+  <ul>
+    <li><strong>Object</strong>: GetGUID(), GetTypeId(), isType(), AddToWorld(), RemoveFromWorld(), Set/GetUInt32Value()</li>
+    <li><strong>WorldObject</strong>: GetPosition(), Relocate(), GetPhaseMask(), GetMap(), SetPhaseMask()</li>
+    <li><strong>Unit</strong>: Set/GetHealth(), isAlive(), CastSpell(), GetAI()</li>
+    <li><strong>GameObject</strong>: GetGoType(), SetGoState(), UseDoorOrButton()</li>
+    <li><strong>Player</strong>: GetSession(), GetGroup(), TeleportTo()</li>
+    <li><strong>Creature</strong>: AI(), SetReactState(), isWorldBoss()</li>
+    <li><strong>DynamicObject</strong>: GetCaster(), GetSpellInfo()</li>
+  </ul>
+
+  <h3>Sistema de Identificación de Tipos</h3>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>TypeID</th>
+        <th>TypeMask</th>
+        <th>Tipo de Entidad</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>TYPEID_OBJECT</td><td>TYPEMASK_OBJECT</td><td>Object</td><td>Entidad base</td></tr>
+      <tr><td>TYPEID_UNIT</td><td>TYPEMASK_UNIT</td><td>Unit</td><td>Entidades de combate</td></tr>
+      <tr><td>TYPEID_PLAYER</td><td>TYPEMASK_PLAYER</td><td>Player</td><td>Personajes jugadores</td></tr>
+      <tr><td>TYPEID_GAMEOBJECT</td><td>TYPEMASK_GAMEOBJECT</td><td>GameObject</td><td>Objetos interactivos</td></tr>
+      <tr><td>TYPEID_DYNAMICOBJECT</td><td>TYPEMASK_DYNAMICOBJECT</td><td>DynamicObject</td><td>Efectos de hechizos</td></tr>
+    </tbody>
+  </table>
+  <p>El método <code>isType()</code> utiliza operaciones bitwise para comprobación eficiente en tiempo de ejecución.</p>
+
+  <h3>Ciclo de Vida de Objetos y Gestión</h3>
+  <ul>
+    <li><strong>Creación:</strong> _InitValues() y _Create()</li>
+    <li><strong>Entrada en Mundo:</strong> AddToWorld() y registro en sistema de grids</li>
+    <li><strong>Estado Activo:</strong> Participa en actualizaciones e interacciones</li>
+    <li><strong>Salida de Mundo:</strong> RemoveFromWorld() y limpieza de referencias</li>
+    <li><strong>Destrucción:</strong> Limpieza de arrays y referencias</li>
+  </ul>
+
+  <h3>Sistema de Valores y Actualizaciones</h3>
+  <p>El sistema de valores sincroniza datos entre servidor y cliente, con detección de cambios y transmisión eficiente:</p>
+  <ul>
+    <li><strong>Array de Valores:</strong> <code>m_uint32Values[]</code></li>
+    <li><strong>UpdateMask:</strong> Rastrea campos modificados</li>
+    <li><strong>Métodos:</strong> Get/Set UInt32, Float, UInt64; ApplyModUInt32Value(); Set/RemoveFlag()</li>
+    <li><strong>Bloques de Actualización:</strong> _BuildValuesUpdate(), WorldPacket</li>
+  </ul>
+
+  <h3>Sistemas Espaciales y Gestión de Grids</h3>
+  <ul>
+    <li>Particionamiento del mundo en grids y celdas</li>
+    <li>Mapas, coordenadas y referencias de grid</li>
+    <li>Notificadores:
+      <ul>
+        <li>VisibleNotifier: cambios de visibilidad</li>
+        <li>GridUpdater: actualizaciones por tiempo</li>
+        <li>RelocationNotifier: movimiento entre grids</li>
+        <li>MessageDistDeliverer: distribución de paquetes según proximidad</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>Identificación de Entidades y GUIDs</h3>
+  <ul>
+    <li>GUIDs globalmente únicos</li>
+    <li>Formato PackGUID para transmisión de red</li>
+    <li>GuidHigh2TypeId() convierte GUIDs a TypeID sin acceder al objeto</li>
+  </ul>
+
+  <h3>Posición e Integración de Movimiento</h3>
+  <ul>
+    <li>Sistema de coordenadas 3D con orientación</li>
+    <li>Asociación a mapas específicos</li>
+    <li>Gestión de fases para visibilidad por jugador</li>
+    <li>Soporte de relocación y consultas espaciales</li>
+  </ul>
+</section>
+
+<section id="object-hierarchy" class="mb-5">
+  <h2>Object Hierarchy</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Esta sección cubre la jerarquía de objetos que representa todas las entidades del juego, desde la clase base <code>Object</code> hasta <code>WorldObject</code>, incluyendo sincronización de campos, gestión de GUID, actualizaciones para clientes e integración en grids.</p>
+
+  <h3>Arquitectura de la Clase Base Object</h3>
+  <p>La clase <code>Object</code> proporciona servicios esenciales como identificación única, almacenamiento de datos basado en campos y sincronización con clientes.</p>
+
+  <h3>Sistema de Identificación de Objetos</h3>
+  <p>Cada objeto tiene un GUID de 64 bits compuesto por:</p>
+  <ul>
+    <li>GUID Low (32-bit): Identificador de instancia</li>
+    <li>GUID Mid (16-bit): Entry ID</li>
+    <li>GUID High (16-bit): Type Identifier</li>
+  </ul>
+  <p>Tipos de entidad principales:</p>
+  <ul>
+    <li>TYPEID_ITEM</li>
+    <li>TYPEID_UNIT</li>
+    <li>TYPEID_PLAYER</li>
+    <li>TYPEID_GAMEOBJECT</li>
+    <li>TYPEID_DYNAMICOBJECT</li>
+    <li>TYPEID_CORPSE</li>
+    <li>TYPEID_AREATRIGGER</li>
+  </ul>
+
+  <h3>Arquitectura del Sistema de Campos</h3>
+  <p>Los objetos usan un sistema de campos dinámico para almacenar y sincronizar datos con los clientes:</p>
+  <ul>
+    <li><code>m_uint32Values[]</code>: array de campos</li>
+    <li><code>_changesMask</code>: UpdateMask de cambios</li>
+    <li><code>m_valuesCount</code>: cantidad de campos</li>
+    <li>Acceso tipo seguro: <code>m_int32Values</code>, <code>m_uint32Values</code>, <code>m_floatValues</code></li>
+    <li>Métodos: Get/Set UInt32, Float</li>
+  </ul>
+
+  <h3>Extensiones Espaciales de WorldObject</h3>
+  <p><code>WorldObject</code> extiende <code>Object</code> con funcionalidad espacial, integración con mapas y visibilidad:</p>
+  <ul>
+    <li>Posición: <code>m_positionX, Y, Z</code>, orientación</li>
+    <li>Métodos de movimiento: Relocate(), MovePosition()</li>
+    <li>Mapas: <code>m_currMap</code>, <code>m_InstanceId</code>, <code>m_phaseMask</code></li>
+    <li>Visibilidad: <code>m_stealth</code>, <code>m_invisibility</code> y arrays de detección</li>
+  </ul>
+
+  <h3>Gestión de Fases y Visibilidad</h3>
+  <p>Soporte para sigilo, invisibilidad y visibilidad basada en fases:</p>
+  <ul>
+    <li>canSeeOrDetect(), CanNeverSee()</li>
+    <li>InSamePhase()?, CanAlwaysSee()</li>
+    <li>Detección de sigilo y invisibilidad: <code>m_stealth vs m_stealthDetect</code>, <code>m_invisibility vs m_invisibilityDetect</code></li>
+  </ul>
+
+  <h3>Sistema de Actualización y Sincronización con Clientes</h3>
+  <p>Los objetos sincronizan su estado con los clientes mediante un sistema eficiente de actualización:</p>
+  <ul>
+    <li>Bloques de actualización: BuildUpdate(), BuildCreateUpdateBlockForPlayer()</li>
+    <li>Determinación de tipo de actualización: UPDATETYPE_CREATE_OBJECT, UPDATETYPE_CREATE_OBJECT2</li>
+    <li>Manejo de UpdateMask: _SetUpdateBits(), _SetCreateBits(), _BuildValuesUpdate()</li>
+    <li>Serialización: ByteBuffer</li>
+  </ul>
+
+  <h3>Visibilidad y Seguridad de Campos</h3>
+  <ul>
+    <li>Flags base: UF_FLAG_PUBLIC, UF_FLAG_PRIVATE</li>
+    <li>Flags por tipo: Items, Units/Players, GameObjects</li>
+    <li>Relaciones: UF_FLAG_OWNER, UF_FLAG_PARTY_MEMBER, UF_FLAG_SPECIAL_INFO</li>
+  </ul>
+
+  <h3>Integración con Grids y Consultas Espaciales</h3>
+  <ul>
+    <li>Referencias: GridObject, GridReference, GridRefManager, MapObject</li>
+    <li>Celdas y posición: <code>Cell _currentCell</code>, <code>_moveState</code>, <code>_newPosition</code></li>
+    <li>Métodos de búsqueda espacial: VisitNearbyObject(), VisitNearbyGridObject(), VisitNearbyWorldObject()</li>
+    <li>Encuentros cercanos: FindNearestCreature(), FindNearestGameObject(), FindNearestPlayer()</li>
+  </ul>
+
+  <h3>Gestión del Ciclo de Vida de Objetos</h3>
+  <ul>
+    <li>Creación: Object(), _InitValues(), _Create(), SetUInt64Value(OBJECT_FIELD_GUID), SetUInt16Value(OBJECT_FIELD_TYPE), AddToWorld()</li>
+    <li>Integración en mundo: m_inWorld = true, ClearUpdateMask()</li>
+    <li>Salida de mundo: RemoveFromWorld(), m_inWorld = false, ClearUpdateMask()</li>
+    <li>Destrucción y limpieza: ~Object(), sObjectAccessor->RemoveUpdateObject(), delete[] m_uint32Values, ~WorldObject(), ResetMap()</li>
+  </ul>
+</section>
+
+<section id="unit-system" class="mb-5">
+  <h2>Unit System and Combat</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Esta sección cubre el sistema Unit, base de todas las entidades de combate en OlympusCore. La clase <code>Unit</code> sirve como base para jugadores y criaturas, proporcionando mecánicas de combate, movimiento, lanzamiento de hechizos y gestión de estados.</p>
+
+  <h3>Arquitectura Core de Unit</h3>
+  <p>La clase <code>Unit</code> es abstracta y gestiona:</p>
+  <ul>
+    <li>Movimientos y pathfinding: <code>MotionMaster</code></li>
+    <li>Gestión de amenazas y aggro: <code>ThreatManager</code></li>
+    <li>Hechizos y efectos: Spell System</li>
+    <li>Efectos persistentes: Aura System</li>
+    <li>Control de comportamiento: AI System</li>
+    <li>Control de mascotas/minions: <code>CharmInfo</code></li>
+  </ul>
+  <p>Jerarquía de clases principales:</p>
+  <ul>
+    <li>WorldObject &gt; Unit &gt; Player/Creature</li>
+    <li>TempSummon, Pet, Totem, Guardian</li>
+  </ul>
+
+  <h3>Mecánicas de Combate y Sistema de Daño</h3>
+  <ul>
+    <li>Tipos de daño: DIRECT_DAMAGE, SPELL_DIRECT_DAMAGE, DOT, NODAMAGE</li>
+    <li>Fases de combate: Validación de ataque, Cálculo de daño, Mitigación (armor/resist/absorb), Aplicación final de daño</li>
+    <li>Sistema de Procs: Eventos que disparan efectos</li>
+    <li>Gestión de amenaza: ThreatManager y cálculo de victim</li>
+    <li>Sistema de ataque: BASE_ATTACK, OFF_ATTACK, RANGED_ATTACK</li>
+    <li>Alcance de combate: GetCombatReach(), IsWithinMeleeRange(), GetLeewayBonusRange()</li>
+  </ul>
+
+  <h3>Estados de Unidad y Movimiento</h3>
+  <ul>
+    <li>Flags de estado: UNIT_STATE_*</li>
+    <li>Estados de muerte: ALIVE, CORPSE, DEAD</li>
+    <li>Estados de combate: In/Out of Combat</li>
+    <li>Movimiento: UNIT_STATE_MOVING, ROAMING, CHASE, FLEEING, ROOT, STUNNED, CONFUSED, POSSESSED, CASTING</li>
+    <li>Movimiento spline: MoveSpline(), UpdateSplineMovement(), UpdateSplinePosition()</li>
+    <li>Gestión de velocidad: baseMoveSpeed[], m_speed_rate[], UpdateSpeed()</li>
+  </ul>
+
+  <h3>Integración de Hechizos</h3>
+  <ul>
+    <li>Sistema de interrupción y validación: CanCast(), SPELL_STATE_PREPARING, SPELL_STATE_CASTING</li>
+    <li>Estados de hechizos activos: CURRENT_GENERIC_SPELL, CURRENT_CHANNELED_SPELL, CURRENT_AUTOREPEAT_SPELL</li>
+    <li>Impacto de movimiento, daño, stun/silence y muerte sobre hechizos</li>
+    <li>Sistema de cooldown global: GlobalCooldownMgr, HasGlobalCooldown(), AddGlobalCooldown()</li>
+  </ul>
+
+  <h3>Integración con AI y Comportamiento</h3>
+  <ul>
+    <li>Unidad integrada con AI: UnitAI, CreatureAI</li>
+    <li>Eventos AI: UpdateAI(), SelectVictim(), EnterCombat(), JustDied(), SpellHit()</li>
+    <li>Gestión de amenaza y target: ThreatManager, AddThreat(), getVictim()</li>
+    <li>Habilidades reactivas: m_reactiveTimer[], UpdateReactives()</li>
+    <li>Control de mascotas: CharmInfo, GetCharmInfo(), Pet AI</li>
+  </ul>
+
+  <h3>Ciclo de Actualización y Rendimiento</h3>
+  <ul>
+    <li>Ciclo Unit::Update(p_time) optimizado para cientos de unidades</li>
+    <li>Actualización condicional: eventos, hechizos activos, cooldowns, threat, timers, reactivas, auras, movimiento, MotionMaster, guardian speed, orientación</li>
+    <li>Consideraciones de rendimiento: frecuencia variable por tipo de unidad, actualizaciones time-sliced, optimización para raids grandes</li>
+    <li>Validación de estado: ASSERT(!m_procDeep), validación de timers y consistencia de hechizos</li>
+  </ul>
+</section>
+
+<section id="player-group-management" class="mb-5">
+  <h2>Player and Group Management</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Esta sección cubre el sistema de entidades Player y la coordinación de grupos en OlympusCore. Incluye arquitectura de la clase Player, formación de grupos, interacción social y coordinación multijugador.</p>
+
+  <h3>Arquitectura de la Entidad Player</h3>
+  <p>La clase <code>Player</code> representa personajes controlados por humanos y extiende <code>Unit</code> con funcionalidades específicas:</p>
+  <ul>
+    <li>Seguimiento de logros: <code>AchievementMgr</code></li>
+    <li>Reputación de facciones: <code>ReputationMgr</code></li>
+    <li>Sistema de arqueología: <code>ArcheologyMgr</code></li>
+    <li>Gestión de talentos: <code>PlayerTalentInfo</code></li>
+    <li>Gestión de fases: <code>PhaseMgr</code></li>
+    <li>Sistema social: <code>PlayerSocial</code></li>
+    <li>Intercambios de items: <code>TradeData</code></li>
+    <li>Gestión de grupos y gremios: <code>Group</code> y <code>Guild</code></li>
+  </ul>
+
+  <h3>Componentes Core del Player</h3>
+  <ul>
+    <li><strong>m_achievementMgr:</strong> seguimiento y recompensas de logros</li>
+    <li><strong>m_reputationMgr:</strong> gestión de reputación</li>
+    <li><strong>m_social:</strong> amigos y lista de ignorados</li>
+    <li><strong>_talentMgr:</strong> asignación de puntos de talento</li>
+    <li><strong>phaseMgr:</strong> sistema de phasing para instancias</li>
+  </ul>
+
+  <h3>Creación e Inicialización del Player</h3>
+  <ol>
+    <li>ObjectMgr y CharacterDatabase preparan la información del jugador</li>
+    <li>Se inicializan valores base: raza, clase, género</li>
+    <li>InitDisplayIds() establece la apariencia</li>
+    <li>Se guarda la información del personaje en la base de datos</li>
+  </ol>
+
+  <h3>Arquitectura del Sistema de Grupos</h3>
+  <ul>
+    <li>Tipos de grupo: PARTY (5), RAID (40), BG, LFG</li>
+    <li>Gestión de miembros: MemberSlotList y GroupRefManager</li>
+    <li>Invitaciones pendientes: InvitesList</li>
+    <li>Bind de instancias: BoundInstancesMap</li>
+    <li>Métodos de loot: LootMethod y Roll</li>
+  </ul>
+
+  <h3>Gestión de Miembros de Grupo</h3>
+  <ul>
+    <li>Agregar miembro: <code>AddMember(Player*)</code></li>
+    <li>Eliminar miembro: <code>RemoveMember(uint64, RemoveMethod)</code></li>
+    <li>Cambiar líder: <code>ChangeLeader(uint64)</code></li>
+    <li>Asignar roles LFG: <code>SetLfgRoles(uint64, uint8)</code></li>
+  </ul>
+
+  <h3>Sistema Social</h3>
+  <ul>
+    <li>Gestión de amigos y lista de ignorados a través de <code>PlayerSocial</code></li>
+    <li>Operaciones asincrónicas con base de datos</li>
+  </ul>
+
+  <h3>Sistema de Intercambio</h3>
+  <ul>
+    <li>Clase <code>TradeData</code> gestiona items y oro</li>
+    <li>Componentes: <code>m_player</code>, <code>m_trader</code>, <code>m_items[7]</code>, <code>m_money</code>, <code>m_spell</code>, <code>m_accepted</code></li>
+  </ul>
+
+  <h3>Sistemas de Recompensas y Progresión</h3>
+  <ul>
+    <li>Clase <code>KillRewarder</code> gestiona XP, honor y reputación</li>
+    <li>Factores considerados: tamaño y nivel del grupo, nivel del jugador, tipo de instancia, membresía de guild</li>
+  </ul>
+
+  <h3>Gestión de Instancias y Dificultad</h3>
+  <ul>
+    <li>Bind de grupo a instancias: <code>InstanceGroupBind</code></li>
+    <li>Herencia automática de bind si el líder posee bind permanente</li>
+    <li>Escalado de dificultad: Dungeons (Normal/Heroic), Raids (10/25 Normal/Heroic)</li>
+  </ul>
+
+  <h3>Sistema de Loot y Rolls</h3>
+  <ul>
+    <li>Distribución de items mediante sistema de roll</li>
+    <li>Tipos de roll: PASS, NEED, GREED, DISENCHANT</li>
+    <li>Ciclo de roll: crear objeto, enviar SMSG_LOOT_START_ROLL, recolectar votos, asignar item</li>
+  </ul>
+
+  <h3>Integración de Bots</h3>
+  <ul>
+    <li>Sistema NPC bot que se integra con player y group</li>
+    <li>Componentes: <code>BotHelper</code>, <code>NpcBotMap[MAX_NPCBOTS]</code></li>
+    <li>Configuración: maxNpcBots, follow distance, reducción XP</li>
+    <li>Efectos: XP distribuido reducido, loot FFA, limitaciones de instancias según configuración</li>
+  </ul>
+</section>
+
+<section id="game-mechanics" class="mb-5">
+  <h2>Game Mechanics</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Esta sección cubre los sistemas principales de mecánicas de juego en OlympusCore, enfocándose en hechizos, selección de objetivos y ejecución de efectos.</p>
+
+  <h3>Spell System Overview</h3>
+  <p>El sistema de hechizos proporciona un marco unificado para manejar habilidades de jugadores, hechizos de NPC, efectos de objetos y interacciones ambientales.</p>
+
+  <h3>Core Spell Architecture</h3>
+  <ul>
+    <li><strong>Data Management</strong></li>
+    <li><strong>Spell Execution Pipeline</strong></li>
+    <li><strong>Core Spell Classes:</strong> Spell, SpellInfo, SpellCastTargets, SpellValue</li>
+    <li><strong>Client Request Processing:</strong> CMSG_CAST_SPELL, CMSG_USE_ITEM</li>
+    <li><strong>SpellMgr:</strong> gestor global de hechizos y efectos</li>
+  </ul>
+
+  <h3>Spell Data Management</h3>
+  <ul>
+    <li>SpellEntry (DBC) → SpellInfo</li>
+    <li>SpellEffectEntry → SpellEffectInfo</li>
+    <li>SpellScalingEntry → SpellMgr</li>
+    <li>mSpellChains, mSpellTargetPositions, mSpellBonusMap, mSpellProcMap</li>
+  </ul>
+
+  <h3>Spell Casting Pipeline</h3>
+  <ol>
+    <li>Procesamiento de solicitud del cliente</li>
+    <li>Creación y preparación del spell: <code>new Spell()</code>, <code>prepare()</code></li>
+    <li>Selección de objetivos: <code>SelectSpellTargets()</code></li>
+    <li>Validación: <code>CheckCast()</code></li>
+    <li>Ejecución: <code>cast()</code>, manejo de efectos</li>
+  </ol>
+
+  <h3>Target Selection System</h3>
+  <p>Soporta objetivos explícitos (seleccionados por el jugador) e implícitos (determinados por los efectos del hechizo).</p>
+  <ul>
+    <li><strong>Explicit:</strong> SelectExplicitTargets()</li>
+    <li><strong>Implicit:</strong> SelectEffectImplicitTargets()</li>
+    <li>Tipos de objetivo: UNIT, GAMEOBJECT, ITEM, DEST_LOCATION, AREA, CONE, NEARBY, CHANNEL</li>
+  </ul>
+
+  <h3>Spell Effect System</h3>
+  <p>Los efectos son las unidades fundamentales de funcionalidad de hechizos, desde daño y curación hasta invocaciones.</p>
+  <ul>
+    <li><strong>Effect Handler:</strong> SpellEffects[TOTAL_SPELL_EFFECTS]</li>
+    <li>Acceso a <code>SpellEffectInfo</code>: puntos base, valores misceláneos, info de objetivos</li>
+  </ul>
+
+  <h3>Common Effect Types</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Handler Function</th>
+        <th>Propósito</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>2</td><td>EffectSchoolDMG</td><td>Daño según escuela de hechizo</td></tr>
+      <tr><td>3</td><td>EffectDummy</td><td>Efectos personalizados</td></tr>
+      <tr><td>6</td><td>EffectApplyAura</td><td>Aplica auras persistentes</td></tr>
+      <tr><td>10</td><td>EffectHeal</td><td>Restaura salud</td></tr>
+      <tr><td>24</td><td>EffectCreateItem</td><td>Crea ítems en inventario</td></tr>
+      <tr><td>28</td><td>EffectSummonType</td><td>Invoca criaturas u objetos</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Spell Targeting Mechanics</h3>
+  <ul>
+    <li>Tipos de referencia: SpellImplicitTargetInfo → categoría de selección, tipo de objeto, referencia, chequeo de amistad/enemigo</li>
+    <li>Tipos de objeto: UNIT, GOBJ, ITEM, DEST</li>
+    <li>Categorías de selección: AREA, CONE, NEARBY, DEFAULT</li>
+  </ul>
+
+  <h3>Target Flag System</h3>
+  <ul>
+    <li>Unit Flags: TARGET_FLAG_UNIT, TARGET_FLAG_UNIT_ENEMY, TARGET_FLAG_UNIT_ALLY, TARGET_FLAG_UNIT_PARTY, TARGET_FLAG_UNIT_RAID</li>
+    <li>Location Flags: TARGET_FLAG_SOURCE_LOCATION, TARGET_FLAG_DEST_LOCATION</li>
+    <li>Object Flags: TARGET_FLAG_GAMEOBJECT, TARGET_FLAG_ITEM</li>
+    <li>Special Flags: TARGET_FLAG_CORPSE_ALLY</li>
+  </ul>
+
+  <h3>Aura System Integration</h3>
+  <p>El sistema de hechizos se integra con el sistema de auras para efectos persistentes:</p>
+  <ul>
+    <li>Aplicación: <code>EffectApplyAura()</code></li>
+    <li>Tipos de aura: SPELL_AURA_MOD_STAT, SPELL_AURA_PERIODIC_DAMAGE, SPELL_AURA_MOD_RESISTANCE, SPELL_AURA_MOD_INCREASE_SPEED</li>
+    <li>Reglas de apilamiento y duración gestionadas por SpellMgr</li>
+  </ul>
+
+  <h3>Skill System Integration</h3>
+  <p>Soporte para mecánicas basadas en habilidades, como arqueología:</p>
+  <ul>
+    <li>Hechizos de arqueología usan castFlags especiales (0x8)</li>
+    <li>Procesamiento de fragmentos y keystones</li>
+    <li>Validación de proyecto de investigación</li>
+    <li>Creación de artefactos</li>
+  </ul>
+</section>
+
+<section id="spell-system" class="mb-5">
+  <h2>Spell System</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Este sistema es el marco principal de habilidades mágicas en OlympusCore, encargado de manejar la preparación, selección de objetivos, ejecución de efectos y gestión de datos de los hechizos.</p>
+
+  <h3>Purpose and Scope</h3>
+  <p>Procesa solicitudes de hechizos del cliente, valida condiciones, ejecuta efectos y administra auras persistentes.</p>
+
+  <h3>Core Architecture</h3>
+  <ul>
+    <li>Effect Execution</li>
+    <li>Casting Engine</li>
+    <li>Spell Management</li>
+    <li>Network Layer</li>
+    <li>SpellHandler: <code>HandleCastSpellOpcode()</code>, <code>HandleUseItemOpcode()</code>, <code>HandleCancelCastOpcode()</code></li>
+    <li>SpellMgr (Singleton): <code>SpellInfo</code>, Spell Chains & Ranks, DBC Data Loading</li>
+    <li>Spell (Active Instance): <code>SpellValue</code>, <code>SpellCastTargets</code>, <code>prepare()</code>, <code>cast()</code></li>
+    <li>SpellEffects Array, SpellEffectInfo</li>
+    <li>Target Selection: Unit System, Player System, WorldObject, Aura System</li>
+  </ul>
+
+  <h3>Class Relationships</h3>
+  <ul>
+    <li><strong>SpellMgr:</strong> mSpellInfoMap, mSpellChains, <code>GetSpellInfo(spellId)</code>, <code>IsSpellValid()</code>, <code>LoadSpellRanks()</code></li>
+    <li><strong>SpellInfo:</strong> Id, Effects[MAX_SPELL_EFFECTS], <code>GetExplicitTargetMask()</code>, <code>IsPositive()</code>, <code>CheckExplicitTarget()</code></li>
+    <li><strong>Spell:</strong> m_caster, m_targets, m_spellValue, <code>prepare(targets)</code>, <code>cast()</code>, <code>SelectSpellTargets()</code></li>
+    <li><strong>SpellCastTargets:</strong> m_objectTarget, m_src, m_dst, <code>Read(data, caster)</code>, <code>SetUnitTarget()</code></li>
+    <li><strong>SpellEffectInfo:</strong> Effect, ApplyAuraName, TargetA/B, <code>CalcValue()</code>, <code>CalcRadius()</code></li>
+  </ul>
+
+  <h3>Spell Casting Lifecycle</h3>
+  <ol>
+    <li>Client Request → SpellHandler → SpellMgr → Spell → EffectHandler</li>
+    <li>Preparación: <code>prepare()</code>, validación con <code>CheckCast()</code></li>
+    <li>Selección de objetivos: <code>SelectSpellTargets()</code>, <code>SelectExplicitTargets()</code></li>
+    <li>Ejecución: <code>cast()</code>, <code>ExecuteEffects()</code></li>
+    <li>Feedback al cliente: SMSG_SPELL_GO, SMSG_CAST_FAILED, SMSG_SPELL_FAILURE</li>
+  </ol>
+
+  <h3>Spell State Management</h3>
+  <table class="table">
+    <thead>
+      <tr><th>Phase</th><th>State</th><th>Key Methods</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Creation</td><td>SPELL_STATE_NULL</td><td>Constructor, InitExplicitTargets()</td><td>Inicializa instancia y targeting básico</td></tr>
+      <tr><td>Preparation</td><td>SPELL_STATE_PREPARING</td><td>prepare(), CheckCast()</td><td>Valida condiciones de lanzamiento</td></tr>
+      <tr><td>Targeting</td><td>SPELL_STATE_CASTING</td><td>SelectSpellTargets(), SelectExplicitTargets()</td><td>Determina objetivos afectados</td></tr>
+      <tr><td>Execution</td><td>SPELL_STATE_TRAVELING</td><td>cast(), ExecuteEffects()</td><td>Aplica efectos</td></tr>
+      <tr><td>Cleanup</td><td>SPELL_STATE_FINISHED</td><td>finish(), Destructor</td><td>Limpia recursos y estado</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Targeting System</h3>
+  <ul>
+    <li>Componentes: SpellImplicitTargetInfo, SpellCastTargets, SpellDestination</li>
+    <li>Métodos: InitExplicitTargets(), SelectExplicitTargets(), SelectEffectImplicitTargets()</li>
+    <li>Tipos de objetivos: Unit, Area, Destination, GameObject, Channel</li>
+  </ul>
+
+  <h3>Target Types and Flags</h3>
+  <ul>
+    <li>Special Targets: TARGET_FLAG_CORPSE_ALLY, TARGET_FLAG_CORPSE_ENEMY, TARGET_FLAG_STRING</li>
+    <li>Object Targets: TARGET_FLAG_GAMEOBJECT, TARGET_FLAG_GAMEOBJECT_ITEM, TARGET_FLAG_ITEM, TARGET_FLAG_TRADE_ITEM</li>
+    <li>Location Targets: TARGET_FLAG_SOURCE_LOCATION, TARGET_FLAG_DEST_LOCATION</li>
+    <li>Unit Targets: TARGET_FLAG_UNIT_ALLY, TARGET_FLAG_UNIT_ENEMY, TARGET_FLAG_UNIT_PARTY, TARGET_FLAG_UNIT_RAID</li>
+  </ul>
+
+  <h3>Effect System</h3>
+  <p>Los efectos se ejecutan mediante un array de punteros a funciones, mapeando tipos de efecto a handlers:</p>
+  <ul>
+    <li>Damage: EffectSchoolDMG</li>
+    <li>Healing: EffectHeal</li>
+    <li>Aura: EffectApplyAura</li>
+    <li>Summon: EffectSummonType</li>
+    <li>Teleport: EffectTeleportUnits</li>
+    <li>Dummy: EffectDummy</li>
+    <li>InstaKill: EffectInstaKill</li>
+    <li>Create Item: EffectCreateItem</li>
+  </ul>
+
+  <h3>Data Management</h3>
+  <p>SpellMgr gestiona carga, validación y acceso a datos de hechizos:</p>
+  <ul>
+    <li>Mapas: mSpellInfoMap, mSpellChains, mSpellReq, mSpellTargetPositions, mSpellBonusMap, mSpellThreatMap, mSpellLinkedMap, mSpellProcEventMap</li>
+    <li>Métodos: LoadSpellInfoStore(), LoadSpellRanks(), LoadSpellRequired(), IsSpellValid(), GetSpellInfo(), GetSpellChainNode(), GetSpellBonusData(), GetSpellProcEvent()</li>
+  </ul>
+
+  <h3>Network Integration</h3>
+  <ul>
+    <li>Handlers: HandleCastSpellOpcode(), HandleUseItemOpcode(), HandleCancelCastOpcode(), HandleCancelAuraOpcode()</li>
+    <li>Client Packets: CMSG_CAST_SPELL, CMSG_USE_ITEM, CMSG_CANCEL_CAST, CMSG_CANCEL_AURA</li>
+    <li>Server Responses: SMSG_SPELL_START, SMSG_SPELL_GO, SMSG_CAST_FAILED, SMSG_SPELL_FAILURE</li>
+  </ul>
+</section>
+
+<section id="aura-system" class="mb-5">
+  <h2>Aura System</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Este sistema gestiona los efectos mágicos persistentes aplicados a unidades, incluyendo buffs, debuffs, daño periódico y modificaciones temporales a propiedades de la unidad.</p>
+
+  <h3>Core Architecture</h3>
+  <ul>
+    <li><strong>Aura:</strong> Contenedor de efecto persistente (m_duration, m_procCharges, m_stackAmount)</li>
+    <li><strong>AuraApplication:</strong> Instancia aplicada a un objetivo específico (slot, sincronización con cliente)</li>
+    <li><strong>AuraEffect:</strong> Modificaciones individuales a propiedades de unidad (m_effects array)</li>
+    <li><strong>Unit:</strong> Entidad objetivo</li>
+    <li><strong>SpellInfo:</strong> Definición de efecto</li>
+    <li><strong>WorldObject:</strong> Propietario espacial</li>
+    <li><strong>SpellMgr:</strong> Gestión de datos</li>
+    <li><strong>ObjectMgr:</strong> Gestión de entidades</li>
+    <li><strong>ScriptMgr:</strong> Handlers personalizados</li>
+  </ul>
+
+  <h3>Aura Lifecycle Management</h3>
+  <ol>
+    <li><strong>Creation:</strong> <code>Aura::TryCreate()</code>, <code>BuildEffectMaskForOwner()</code></li>
+    <li><strong>Application:</strong> <code>Aura::Create()</code>, <code>_InitEffects()</code>, <code>_ApplyForTarget()</code>, <code>AuraApplication constructor</code></li>
+    <li><strong>Update:</strong> <code>UpdateOwner()</code>, <code>UpdateTargetMap()</code></li>
+    <li><strong>Stack & Charge:</strong> <code>ModStackAmount()</code>, <code>ModCharges()</code></li>
+    <li><strong>Removal:</strong> <code>Remove()</code>, <code>_UnapplyForTarget()</code>, <code>_HandleEffect(false)</code>, <code>_DeleteRemovedApplications()</code></li>
+  </ol>
+
+  <h3>Client Synchronization</h3>
+  <ul>
+    <li>Visible Aura Slots: <code>SetVisibleAura()</code>, <code>GetVisibleAura()</code></li>
+    <li>Update Packets: <code>BuildUpdatePacket()</code>, <code>ClientUpdate()</code></li>
+    <li>Aura Flags: <code>_InitFlags()</code>, AFLAG_* constants</li>
+    <li>Stack/Charge Display: cantidad de stacks, cargas y duración</li>
+  </ul>
+
+  <h3>Stacking and Charge Mechanics</h3>
+  <ul>
+    <li>Gestión de stacks: <code>ModStackAmount()</code>, <code>SetStackAmount()</code>, recalcula efectos con <code>ChangeAmount()</code> y <code>CalculateAmount()</code></li>
+    <li>Sistema de cargas: <code>ModCharges()</code>, <code>IsUsingCharges()</code>, eliminación automática cuando las cargas llegan a cero</li>
+    <li>Proc Events: disparos en combate o lanzamiento de hechizo</li>
+  </ul>
+
+  <h3>Integration with Other Systems</h3>
+  <ul>
+    <li>World System Integration</li>
+    <li>Unit System Integration</li>
+    <li>Aura System Core</li>
+    <li>Spell System Integration: Spell Casting, Spell Effects, Spell Modifiers</li>
+    <li>Unit Properties, Combat Mechanics, Movement Control</li>
+    <li>Area Effects, Zone Auras, Spell Linking</li>
+  </ul>
+
+  <h3>Persistence and State Management</h3>
+  <ul>
+    <li>Save State: <code>CanBeSaved()</code>, exclusión de auras temporales o de vehículos</li>
+    <li>Load State: <code>SetLoadedState()</code>, restauración de duración, cargas y stacks</li>
+    <li>Recalculation: <code>RecalculateAmountOfEffects()</code></li>
+  </ul>
+</section>
+
+<section id="map-spatial-systems" class="mb-5">
+  <h2>Map and Spatial Systems</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Este sistema gestiona la infraestructura espacial del mundo de juego, la posición de objetos y la visibilidad de jugadores.</p>
+
+  <h3>Map Architecture Overview</h3>
+  <ul>
+    <li><strong>Map:</strong> Clase base que maneja áreas persistentes y funcionalidad espacial central</li>
+    <li><strong>InstanceMap:</strong> Maneja contenido instanciado como mazmorras y raids, con sistemas de reseteo</li>
+    <li><strong>BattlegroundMap:</strong> Especializada para instancias PvP</li>
+    <li><strong>MapInstanced:</strong> Gestiona múltiples instancias de la misma plantilla de mapa</li>
+  </ul>
+
+  <h3>Grid and Cell System</h3>
+  <ul>
+    <li>Grids: 64x64 que cubren todo el mapa</li>
+    <li>Cells: Cada grid contiene 8x8 celdas para colocar objetos con precisión</li>
+    <li>Contenedores: <strong>WorldObjects</strong> (objetos activos) y <strong>GridObjects</strong> (objetos pasivos)</li>
+    <li>Coordenadas: <code>GridCoord</code> y <code>CellCoord</code> para indexación espacial</li>
+    <li>Constantes: MAX_NUMBER_OF_GRIDS = 64, MAX_NUMBER_OF_CELLS = 8, TOTAL_NUMBER_OF_CELLS_PER_MAP = 512</li>
+  </ul>
+
+  <h3>Map Loading and Data Management</h3>
+  <ul>
+    <li>Archivos Map: Terreno base, altura, líquidos y áreas</li>
+    <li>VMap: Colisiones visuales para line-of-sight y detección de colisión</li>
+    <li>MMap: Navegación y pathfinding</li>
+    <li>Validación de archivos mediante valores magic esperados</li>
+    <li>Directorios: <code>maps/</code>, <code>vmaps/</code>, <code>mmaps/</code></li>
+  </ul>
+
+  <h3>Object Management</h3>
+  <ul>
+    <li>Ciclo de vida completo de objetos: <code>AddToMap()</code>, <code>RemoveFromMap()</code>, <code>Relocate()</code></li>
+    <li>Contenedores: <strong>WorldObjects</strong> (actualizaciones frecuentes), <strong>GridObjects</strong> (mínimas)</li>
+    <li>Listas de movimiento para cambios de grid/celda</li>
+    <li>Relocalización de criaturas y jugadores con <code>CreatureRelocation()</code> y <code>PlayerRelocation()</code></li>
+  </ul>
+
+  <h3>Visibility and Update System</h3>
+  <ul>
+    <li>Rango de visibilidad: <code>GetVisibilityRange()</code>, <code>DEFAULT_VISIBILITY_DISTANCE</code></li>
+    <li>Marcado de celdas alrededor de jugadores activos para actualizar objetos</li>
+    <li>Patrón visitor: <code>TypeContainerVisitor</code> procesa objetos en celdas marcadas</li>
+    <li>Actualización de objetos con <code>Trinity::ObjectUpdater</code></li>
+    <li>Notificaciones de relocación: <code>ProcessRelocationNotifies()</code></li>
+  </ul>
+
+  <h3>Movement and Relocation</h3>
+  <ul>
+    <li>Tipos de movimiento: misma celda (inmediato), celda/grid diferente (diferido)</li>
+    <li>Listas de movimiento (<code>MoveList</code>) para cambios diferidos</li>
+    <li>Actualización de visibilidad y grid automático para objetos activos</li>
+    <li>Funciones clave: <code>ComputeCellCoord()</code>, <code>EnsureGridLoadedForActiveObject()</code>, <code>AddCreatureToMoveList()</code>, <code>UpdateObjectVisibility()</code></li>
+  </ul>
+
+  <h3>Instance Management</h3>
+  <ul>
+    <li>Tipos de instancias: mazmorra, raid, escenario</li>
+    <li>Control de estado: <code>InstanceMap</code>, <code>InstanceScript</code></li>
+    <li>Mecánicas de reseteo: automáticas o manuales, <code>INSTANCE_RESET_ALL</code>, <code>INSTANCE_RESET_GROUP_DISBAND</code></li>
+    <li>Gestión de jugadores: elegibilidad, binding, máximo de jugadores, estados de jefes</li>
+    <li>Lógica personalizada para encuentros y progresos de instancia</li>
+  </ul>
+</section>
+
+<section id="scripting-framework" class="mb-5">
+  <h2>Scripting Framework</h2>
+  <p><strong>Archivos fuente relevantes:</strong> Este framework permite implementar lógica personalizada, NPCs, hechizos, eventos y comportamientos sin modificar el núcleo del motor del juego.</p>
+
+  <h3>Script Loading Architecture</h3>
+  <p>El sistema centralizado registra todos los scripts durante el arranque del servidor. Se carga de forma modular según categorías:</p>
+  <ul>
+    <li><code>AddScripts()</code>, <code>AddSC_SmartScripts()</code>, <code>AddSpellsScripts()</code></li>
+    <li><code>AddCommandsScripts()</code>, <code>AddCustomScripts()</code>, <code>AddDarkmoonFairScripts()</code></li>
+    <li><code>AddWorldScripts()</code>, <code>AddEasternKingdomsScripts()</code>, <code>AddKalimdorScripts()</code></li>
+    <li><code>AddOutlandScripts()</code>, <code>AddNorthrendScripts()</code>, <code>AddMaelstromScripts()</code></li>
+    <li><code>AddOutdoorPvPScripts()</code>, <code>AddEventsScripts()</code>, <code>AddNPCBotScripts()</code></li>
+    <li>Integración con anticheat: <code>sAnticheatMgr->StartScripts()</code></li>
+  </ul>
+
+  <h3>Script Type Hierarchy</h3>
+  <ul>
+    <li><strong>CreatureScript</strong> → <code>ScriptedAI</code>: NPCs, comportamiento e interacciones</li>
+    <li><strong>BossAI</strong>: IA de jefes</li>
+    <li><strong>SpellScriptLoader</strong> → <code>SpellScript</code>: Efectos de hechizos personalizados</li>
+    <li><strong>AuraScript</strong>: Efectos persistentes de hechizos</li>
+    <li><strong>PlayerScript</strong>: Eventos de jugador</li>
+    <li><strong>InstanceScript</strong>: Gestión de instancias</li>
+    <li><strong>GameObjectScript</strong>: Interacción con objetos del mundo</li>
+  </ul>
+
+  <h3>Script Registration Patterns</h3>
+  <p>Todos los scripts siguen un patrón de registro consistente implementando métodos virtuales y registrándose mediante funciones loader dedicadas:</p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Tipo de Script</th>
+        <th>Clase Base</th>
+        <th>Uso Principal</th>
+        <th>Métodos Clave</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CreatureScript</td>
+        <td>ScriptedAI</td>
+        <td>NPCs y comportamientos</td>
+        <td>OnGossipHello, OnGossipSelect, UpdateAI</td>
+      </tr>
+      <tr>
+        <td>SpellScriptLoader</td>
+        <td>SpellScript</td>
+        <td>Efectos de hechizos</td>
+        <td>HandleDummy, FilterTargets, Register</td>
+      </tr>
+      <tr>
+        <td>SpellScriptLoader</td>
+        <td>AuraScript</td>
+        <td>Efectos persistentes de hechizos</td>
+        <td>HandleApply, OnRemove, Register</td>
+      </tr>
+      <tr>
+        <td>PlayerScript</td>
+        <td>N/A</td>
+        <td>Eventos de jugador</td>
+        <td>OnUpdateZone, OnLogin, OnLogout</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Example Registration Implementation</h3>
+  <pre><code>// DarkmoonFairScripts.cpp
+void AddDarkmoonFairScripts()
+{
+    new npc_darkmoon_mallet();
+    new npc_wack_a_gnoll_barrel();
+    new spell_cognez_dummy();
+    new spell_magic_wings();
+    new darkmoon_fair_playerscript();
+}
+</code></pre>
+
+  <h3>Event-Driven Script Execution</h3>
+  <p>Los scripts se integran mediante callbacks y ciclos de actualización del juego:</p>
+  <ul>
+    <li>Interacciones de NPCs: <code>OnGossipHello()</code>, <code>OnGossipSelect()</code></li>
+    <li>Validación de quests y lanzamiento de hechizos: <code>HasItemCount()</code>, <code>CastSpell()</code>, <code>HandleDummy()</code></li>
+    <li>Integración con <code>SpellSystem</code>, <code>Creature</code>, <code>WorldSession</code> y <code>Player</code></li>
+  </ul>
+
+  <h3>Zone-Specific Script Organization</h3>
+  <ul>
+    <li><code>AddEasternKingdomsScripts()</code> → zonas de Eastern Kingdoms (Stormwind, Ironforge, Undercity)</li>
+    <li><code>AddKalimdorScripts()</code> → zonas de Kalimdor (Orgrimmar, Thunder Bluff, Darnassus)</li>
+    <li><code>AddNorthrendScripts()</code> → zonas de Northrend (Icecrown Citadel, Ulduar)</li>
+    <li><code>AddMaelstromScripts()</code> → zonas de Cataclysm (Deepholm, The Stonecore)</li>
+    <li><code>AddEventsScripts()</code> → eventos de temporada</li>
+  </ul>
+
+  <h3>Custom Enhancement Integration</h3>
+  <p>Soporta extensiones del servidor mediante scripts personalizados, como:</p>
+  <ul>
+    <li><code>AddCustomScripts()</code>, <code>AddLeoDevScripts()</code></li>
+    <li>Características como boost de nivel, teletransportes y quests personalizadas</li>
+  </ul>
+</section>
+
+<section id="development-scripts">
+  <h3>Development Scripts Integration</h3>
+  <p>
+    Los <strong>Development Scripts</strong> proporcionan herramientas y funcionalidades enfocadas en pruebas y desarrollo de contenido del servidor. Estos scripts se cargan mediante <code>AddLeoDevScripts()</code> y no dependen de compilación condicional.
+  </p>
+  <ul>
+    <li>Herramientas de depuración de eventos y NPCs</li>
+    <li>Pruebas de IA de criaturas y hechizos</li>
+    <li>Registro de métricas de scripts y rendimiento</li>
+  </ul>
+  <pre>
+void AddLeoDevScripts()
+{
+    new dev_event_logger();
+    new dev_npc_spawner();
+    new dev_spell_tester();
+    // ... otros scripts de desarrollo
+}
+  </pre>
+  <p>Fuente: <code>src/server/scripts/Development/leo_dev_scripts.cpp</code></p>
+</section>
+
+<section id="zone-script-examples">
+  <h3>Zone Script Examples</h3>
+  <p>
+    Los scripts de zona se organizan modularmente por región o mazmorra. Cada módulo implementa sus <code>AddSC_*</code> específicos, permitiendo mantener un sistema escalable y organizado.
+  </p>
+
+  <h4>Ejemplo: Maelstrom</h4>
+  <pre>
+void AddMaelstromScripts()
+{
+    AddSC_kezan();
+    AddSC_deepholm();
+    AddSC_lost_isle();
+    AddSC_boss_corborus(); // Stonecore
+    AddSC_boss_azil();
+    // ... otros contenidos de la zona
+}
+  </pre>
+  <p>Fuente: <code>src/server/scripts/Maelstrom/maelstrom_script_loader.cpp</code></p>
+
+  <h4>Ejemplo: Eastern Kingdoms</h4>
+  <pre>
+void AddEasternKingdomsScripts()
+{
+    AddSC_elwynn_forest();
+    AddSC_westfall();
+    AddSC_duskwood();
+    AddSC_boss_lord_overseer();
+    // ... otros contenidos de la zona
+}
+  </pre>
+  <p>Fuente: <code>src/server/scripts/EasternKingdoms/eastern_kingdoms_loader.cpp</code></p>
+
+  <h4>Ejemplo: Outland</h4>
+  <pre>
+void AddOutlandScripts()
+{
+    AddSC_nagrand();
+    AddSC_shadowmoon_valley();
+    AddSC_hellfire_peninsula();
+    AddSC_boss_kaelthas();
+    // ... otros contenidos de la zona
+}
+  </pre>
+  <p>Fuente: <code>src/server/scripts/Outland/outland_loader.cpp</code></p>
+</section>
+
+<section id="integration-summary">
+  <h3>Integration Summary</h3>
+  <p>
+    El sistema de carga de scripts del OlympusCore asegura que todos los contenidos —desde SmartScripts hasta scripts de desarrollo— se registren en el orden correcto, integrándose completamente con el motor del juego. Esto garantiza:
+  </p>
+  <ul>
+    <li>Compatibilidad con la arquitectura TrinityCore</li>
+    <li>Carga ordenada de scripts por categoría y zona</li>
+    <li>Soporte para extensiones personalizadas y herramientas de desarrollo</li>
+    <li>Mantenimiento de la coherencia de eventos, IA de criaturas y efectos de hechizos</li>
+  </ul>
+  <p>Fuentes: <code>src/server/game/Scripting/ScriptLoader.cpp</code>, <code>src/server/scripts/Custom/custom_script_loader.cpp</code></p>
+</section>
+
+<section id="custom-enhancement-scripts">
+  <h3>Custom Enhancement Scripts</h3>
+  <p>
+    Estos scripts proporcionan características de calidad de vida y mejoras de gameplay específicas del servidor Olympus-Cata. Implementan NPCs interactivos, comandos y sistemas automáticos que extienden la funcionalidad base del juego.
+  </p>
+
+  <h4>Level Booster System</h4>
+  <p>Permite a los nuevos jugadores alcanzar el nivel máximo con equipo, oro y hechizos asignados automáticamente. Incluye medidas anti-abuso mediante seguimiento de cuenta e IP.</p>
+  <ul>
+    <li>NPC: <code>npc_level_booster</code> – ofrece el servicio de boost</li>
+    <li>Login Announcement: <code>npc_level_boosterAnnouncer</code></li>
+    <li>AI NPC: <code>gambler_passivesAI</code></li>
+  </ul>
+  <pre>
+OnGossipSelect:
+  GiveLevel(85)
+  ModifyMoney(50000000)
+  learnSpell(...)
+  StoreNewItemInBestSlots(...)
+  CompleteQuest(...)
+  </pre>
+  <p>Fuentes: <code>src/server/scripts/Custom/Mod_Level_Booster.cpp</code></p>
+
+  <h4>Teleportation System</h4>
+  <p>NPC de teletransporte que permite viajar rápidamente entre ciudades, mazmorras y raids, con validación de facción y estado de combate.</p>
+  <ul>
+    <li>Menu principal: Ciudades, Mazmorras, Raids, PvP</li>
+    <li>Submenú de mazmorras y raids con portales de entrada</li>
+    <li>Validación: <code>getAttackers().empty()</code>, <code>GetTeam()</code></li>
+  </ul>
+  <pre>
+OnGossipHello:
+  Faction-based menu
+  Dungeon submenu
+  Raid submenu
+  City teleports
+  </pre>
+  <p>Fuente: <code>src/server/scripts/Custom/Mod_Teleport.cpp</code></p>
+
+  <h4>Global Chat System</h4>
+  <p>Implementa un canal de comunicación mundial mediante el comando <code>.world</code> con formato basado en rol y seguridad del jugador.</p>
+  <ul>
+    <li>SEC_PLAYER: Texto verde con iconos de facción</li>
+    <li>SEC_MODERATOR: Azul/rojo con iconos de facción</li>
+    <li>SEC_GAMEMASTER: Verde claro</li>
+    <li>SEC_ADMINISTRATOR: Verde brillante</li>
+    <li>SEC_CONSOLE: Cyan</li>
+  </ul>
+  <p>Fuente: <code>src/server/scripts/Custom/Mod_World_Chat.cpp</code></p>
+
+  <h4>Cross-Faction PvE System</h4>
+  <p>Permite que jugadores de la Alianza y la Horda participen juntos en PvE alineando temporalmente la facción de los jugadores según el líder del grupo.</p>
+  <pre>
+Faction Alignment:
+  OnLogin, OnUpdateZone
+  getGroup()->getLeaderGUID()
+  setFaction(leader->getFaction())
+  </pre>
+  <p>Fuente: <code>src/server/scripts/Custom/Mod_Cfpve.cpp</code></p>
+
+  <h4>Instance Reset System</h4>
+  <p>Permite a los jugadores limpiar manualmente los lockouts de instancias mediante NPC.</p>
+  <pre>
+CreatureScript: instance_Reset
+  Unbind all instance saves
+  </pre>
+  <p>Fuente: <code>src/server/scripts/Custom/npc_instance_reset.cpp</code></p>
+
+  <h4>Profession Training System</h4>
+  <p>NPC que enseña profesiones mediante tokens, con validación de nivel, límite de profesiones y skill cap.</p>
+  <ul>
+    <li>Item requerido: <code>MARK_ITEM (100605)</code></li>
+    <li>Nivel mínimo: 80</li>
+    <li>Máximo 2 profesiones principales</li>
+    <li>Skill máximo: 525</li>
+  </ul>
+  <p>Fuente: <code>src/server/scripts/Custom/Mod_Profession.cpp</code></p>
+
+  <h4>Login Announcement System</h4>
+  <p>Proporciona notificaciones globales de conexión y desconexión de jugadores, filtrando miembros del staff y mostrando colores de facción.</p>
+  <p>Fuente: <code>src/server/scripts/Custom/Mod_Announcer.cpp</code></p>
+
+  <h4>Integration Patterns</h4>
+  <ul>
+    <li>Registro de scripts mediante <code>AddSC_*</code></li>
+    <li>Manejo de eventos: <code>OnLogin</code>, <code>OnGossipHello</code>, <code>OnGossipSelect</code></li>
+    <li>Integración con base de datos: <code>LoginDatabase</code> y <code>CharacterDatabase</code></li>
+    <li>Interacción con el jugador: <code>ChatHandler</code>, <code>GossipSystem</code>, métodos directos de <code>Player</code></li>
+    <li>Soporte de configuración: <code>sConfigMgr->GetBoolDefault</code></li>
+  </ul>
+</section>
+
+<section id="game-content-implementation">
+  <h3>Game Content Implementation</h3>
+  <p>
+    Esta sección documenta la implementación de contenido específico del juego, incluyendo encuentros de raids, mecánicas de mazmorras y NPCs del mundo. Se centra en cómo el framework de scripting crea mecánicas complejas, IA personalizada y interacciones especializadas.
+  </p>
+
+  <h4>Content Implementation Architecture</h4>
+  <ul>
+    <li>Game Data / Core Systems / Script Framework Layer / Content Layer</li>
+    <li>Boss Encounters: <code>boss_sinestra.cpp</code></li>
+    <li>World NPCs: <code>npc_*.cpp</code></li>
+    <li>Custom Spells: <code>spell_*.cpp</code></li>
+    <li>Achievements: <code>achievement_*.cpp</code></li>
+    <li>Base Classes: <code>CreatureScript</code>, <code>SpellScriptLoader</code>, <code>ScriptedAI</code>, <code>InstanceScript</code></li>
+    <li>Systems: EventMap, SummonList, Spell System, Aura System, Creature Template, Instance Data</li>
+  </ul>
+  <p>Fuente: <code>src/server/scripts/EasternKingdoms/BastionOfTwilight/boss_sinestra.cpp</code></p>
+
+  <h4>Boss Encounter Structure</h4>
+  <p>Los encuentros combinan AI de criaturas, scripts de hechizos y gestión de instancias para crear peleas multi-fase complejas.</p>
+  <ul>
+    <li>Custom Spells / Event Management / Boss AI / Add Management / SummonList</li>
+    <li>Fases basadas en salud y recursos: Phase 0-3</li>
+    <li>Habilidades principales: <code>SPELL_FLAME_BREATH</code>, <code>NPC_TWILIGHT_WHELP</code>, <code>NPC_SHADOW_ORB</code></li>
+  </ul>
+
+  <h4>Core Boss AI Pattern</h4>
+  <table>
+    <thead>
+      <tr><th>Componente</th><th>Propósito</th><th>Métodos Clave</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>boss_sinestraAI</td><td>Lógica principal</td><td>UpdateAI(), EnterCombat(), Reset()</td></tr>
+      <tr><td>EventMap events</td><td>Temporización de habilidades</td><td>ScheduleEvent(), ExecuteEvent()</td></tr>
+      <tr><td>SummonList summons</td><td>Seguimiento de adds</td><td>Summon(), DespawnAll()</td></tr>
+      <tr><td>Phase Variables</td><td>Gestión de estado</td><td>Health thresholds, custom flags</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Event Scheduling and Management</h4>
+  <p>Se utiliza <code>EventMap</code> para la temporización precisa de habilidades y fases.</p>
+  <ul>
+    <li>Eventos de combate: <code>EVENT_FLAME_BREATH</code>, <code>EVENT_WRACK</code>, <code>EVENT_SUMMON_WHELP</code></li>
+    <li>Eventos de fase: <code>EVENT_SUMMON_CALEN</code>, <code>EVENT_TWILIGHT_EXTINCTION</code></li>
+    <li>Eventos utilitarios: <code>EVENT_MELEE_CHECK</code>, <code>EVENT_WIPE</code></li>
+    <li>Métodos clave: <code>events.ScheduleEvent()</code>, <code>events.Update(diff)</code>, <code>events.ExecuteEvent()</code></li>
+  </ul>
+
+  <h4>Add and NPC Implementation</h4>
+  <p>Los adds requieren AI independiente mientras coordinan con el encuentro principal.</p>
+  <ul>
+    <li>Ejemplos: <code>npc_sinestra_calen</code>, <code>npc_sinestra_twilight_whelp</code>, <code>npc_sinestra_shadow_orb</code>, <code>npc_sinestra_pulsing_twilight_egg</code></li>
+    <li>Coordinación mediante <code>boss_sinestraAI</code> y <code>SummonList</code></li>
+    <li>Acciones: <code>DoAction()</code>, <code>ACTION_START_EGG</code>, <code>ACTION_WIPE</code></li>
+  </ul>
+
+  <h4>Custom Spell Implementation</h4>
+  <p>Los encuentros utilizan <code>SpellScriptLoader</code> para comportamientos de hechizos personalizados:</p>
+  <ul>
+    <li>Modificadores de aura: <code>spell_sinestra_wrack</code>, <code>spell_sinestra_mana_barrier</code></li>
+    <li>Overrides de targeting: <code>spell_sinestra_twilight_slicer</code></li>
+    <li>Handlers de efectos: <code>spell_sinestra_twilight_extinction</code></li>
+    <li>Métodos: <code>OnEffectApply</code>, <code>OnEffectRemove</code>, <code>OnEffectPeriodic</code>, <code>OnObjectAreaTargetSelect</code></li>
+  </ul>
+
+  <h4>Achievement Integration</h4>
+  <p>Se pueden incluir criterios de logros personalizados que rastrean la ejecución mecánica:</p>
+  <ul>
+    <li>Ejemplo: <code>achievement_i_cant_hear_you_over_the_sound_of_how_awesome_i_am</code></li>
+    <li>Métodos: <code>OnCheck()</code>, <code>AllowAchieve()</code></li>
+    <li>Verificación de jugador y estado de la instancia</li>
+  </ul>
+
+  <h4>Script Registration and Loading</h4>
+  <p>Todos los scripts de encuentros deben registrarse para ser reconocidos por el servidor.</p>
+  <ul>
+    <li>Función de registro: <code>AddSC_boss_sinestra()</code></li>
+    <li>Instancias: <code>new boss_sinestra()</code>, <code>new npc_sinestra_*()</code>, <code>new spell_sinestra_*()</code></li>
+    <li>Logros: <code>new achievement_*()</code></li>
+    <li>Integración con ScriptLoader y runtime binding</li>
+  </ul>
+  <p>Fuente: <code>src/server/scripts/EasternKingdoms/BastionOfTwilight/boss_sinestra.cpp</code></p>
+</section>
+
+<section id="boss-encounters-instance-scripts">
+  <h3>Boss Encounters and Instance Scripts</h3>
+  <p>
+    Esta sección cubre la implementación de encuentros de jefes de raid y scripts de instancias dentro de OlympusCore. Se centra en frameworks de IA, gestión de fases, integración de hechizos y mecánicas de encuentros.
+  </p>
+
+  <h4>Boss Encounter Architecture</h4>
+  <ul>
+    <li>Spell Systems / Instance Integration / Event Management</li>
+    <li>Framework de Encuentros: <code>CreatureScript</code>, <code>ScriptedAI</code>, <code>BossAI</code>, <code>EventMap</code>, <code>Phase Management</code>, <code>InstanceScript</code></li>
+    <li>Frames de Encuentro (UI) / Achievement Data / SpellScriptLoader / AuraScript / Target Selection</li>
+  </ul>
+  <p>Fuentes: <code>boss_sinestra.cpp</code>, <code>boss_morchok.cpp</code></p>
+
+  <h4>Boss AI Implementation Patterns</h4>
+  <p>Los jefes implementan clases heredando de <code>CreatureScript</code> con IA interna derivada de <code>ScriptedAI</code> o <code>BossAI</code>.</p>
+  <ul>
+    <li><strong>boss_sinestraAI:</strong> EventMap, SummonList, InstanceScript, fase, Reset(), EnterCombat(), UpdateAI(), DoAction()</li>
+    <li><strong>boss_ds_morchokAI:</strong> EventMap, KohcromSummoned, crystalCount, Reset(), EnterCombat(), DamageTaken(), UpdateAI()</li>
+  </ul>
+
+  <h4>Event-Driven AI System</h4>
+  <table>
+    <thead>
+      <tr><th>Componente</th><th>Propósito</th><th>Ejemplo</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>events.ScheduleEvent()</td><td>Programar habilidades futuras</td><td>events.ScheduleEvent(EVENT_FLAME_BREATH, 25000)</td></tr>
+      <tr><td>events.ExecuteEvent()</td><td>Procesar eventos en cola</td><td>while(uint32 eventId = events.ExecuteEvent())</td></tr>
+      <tr><td>events.SetPhase()</td><td>Gestión de fases del encuentro</td><td>events.SetPhase(PHASE_TWO)</td></tr>
+      <tr><td>events.Reset()</td><td>Limpiar todos los eventos</td><td>Llamado en Reset()</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Phase Management Systems</h4>
+  <p>Los encuentros multi-fase utilizan transiciones condicionadas:</p>
+  <ul>
+    <li>Phase0: Normal abilities (Flame Breath, Wrack, Shadow Orbs, Whelps)</li>
+    <li>Phase1: Mana Barrier, Twilight Extinction, Summon Calen</li>
+    <li>Phase2: Egg Vulnerability, Twilight Infusion</li>
+    <li>Phase3: Final Phase, Enhanced Abilities</li>
+  </ul>
+
+  <h4>Phase Transition Logic</h4>
+  <table>
+    <thead>
+      <tr><th>Chequeo de Fase</th><th>Condición</th><th>Acción</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Basado en Salud</td><td>me->HealthBelowPct(30)</td><td>Trigger Phase 1</td></tr>
+      <tr><td>Basado en Recursos</td><td>me->GetPower(POWER_MANA) &lt; 1</td><td>Entrar Phase 2</td></tr>
+      <tr><td>Basado en Evento</td><td>eggs &gt;= 2</td><td>Progress to Phase 3</td></tr>
+      <tr><td>Basado en Tiempo</td><td>EVENT_CONTINUE_PHASE_2</td><td>Return to Phase 1</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Spell and Effect Integration</h4>
+  <ul>
+    <li>Custom Spell Scripts: SpellScriptLoader, AuraScript</li>
+    <li>Target Filtering / Line-of-sight / Health Conversion / Conditional Effects</li>
+    <li>Ejemplos: <code>spell_sinestra_twilight_slicer</code>, <code>spell_sinestra_mana_barrier</code>, <code>spell_ds_resonating_crystal_explosion</code></li>
+  </ul>
+
+  <h4>Instance-Specific Mechanics</h4>
+  <ul>
+    <li>InstanceScript: gestión central de estados</li>
+    <li>Boss State: NOT_STARTED / IN_PROGRESS / DONE</li>
+    <li>EnterCombat(), JustDied(), DoAction(), GetData()</li>
+    <li>Integración de UI y tracking de logros</li>
+  </ul>
+
+  <h4>Multi-Creature Coordination</h4>
+  <ul>
+    <li>Shared Health: dividir daño entre jefes (Morchok/Kohcrom)</li>
+    <li>Synchronized Events: comunicación DoAction() cross-creature</li>
+    <li>Add Management: SummonList para adds (Sinestra)</li>
+    <li>Vehicle Systems: mecánicas de transporte (Earthen Vortex)</li>
+  </ul>
+
+  <h4>Trash Mob and Environment Systems</h4>
+  <ul>
+    <li>Gestión de trash y elementos ambientales: NPCs dinámicos y triggers</li>
+    <li>Ejemplos: <code>npc_ds_earthen_destroyer</code>, <code>npc_ds_ancient_water_lord</code>, <code>npc_ds_twilight_siege_captain</code></li>
+    <li>AI avanzado: pathing, coordinación de combate, interacción ambiental</li>
+    <li>AreaTrigger Scripts y eventos RP de instancia</li>
+  </ul>
+
+  <h4>Registration and Integration</h4>
+  <p>Ejemplo de registro de encounter:</p>
+  <pre><code>
+void AddSC_boss_sinestra()
+{
+    new boss_sinestra();
+    new npc_sinestra_calen();
+    new npc_sinestra_twilight_spitecaller();
+    // ... additional creature scripts
+    new spell_sinestra_twilight_extinction();
+    new spell_sinestra_wrack();
+    // ... spell scripts
+}
+  </code></pre>
+  <p>Fuente: <code>boss_sinestra.cpp</code>, <code>boss_morchok.cpp</code></p>
+</section>
+
+<section id="world-npcs-zone-scripts">
+  <h3>World NPCs and Zone Scripts</h3>
+  <p>
+    Esta sección cubre la implementación de NPCs especiales y scripts de zona dentro de OlympusCore. Incluye NPCs que aparecen en múltiples zonas y proporcionan funcionalidades esenciales como seguridad, misiones, eventos y servicios especializados.
+  </p>
+
+  <h4>System Overview</h4>
+  <ul>
+    <li>NPCs de mundo globales con funcionalidades centrales</li>
+    <li>Implementación de seguridad, progresión de misiones, eventos y servicios</li>
+    <li>Archivo principal: <code>npcs_special.cpp</code> con más de 20 tipos de NPCs especializados</li>
+  </ul>
+
+  <h4>NPC Script Architecture</h4>
+  <ul>
+    <li>Core Script Types: <code>CreatureScript</code>, <code>ScriptedAI</code>, <code>ScriptedGossip</code>, <code>npc_escortAI</code></li>
+    <li>Categorías de NPCs: Security, Quest, Event, Service, Pet/Summon</li>
+    <li>Ejemplos de NPCs: <code>npc_air_force_bots</code>, <code>npc_doctor</code>, <code>npc_sayge</code>, <code>npc_mount_vendor</code>, <code>npc_t12_mirror_image</code></li>
+    <li>Registro de scripts: <code>ScriptLoader</code> y <code>NPC Script Registry</code></li>
+  </ul>
+
+  <h4>Security and Area Control Systems</h4>
+  <h5>Air Force Bot Network</h5>
+  <ul>
+    <li>Automatización de seguridad en zonas de no vuelo</li>
+    <li>Detección y respuesta usando múltiples NPCs coordinados</li>
+    <li>Componentes: Timer Management, Response System, Detection Layer</li>
+    <li>Tipos de spawn: <code>SPAWNTYPE_TRIPWIRE_ROOFTOP</code>, <code>SPAWNTYPE_ALARMBOT</code></li>
+    <li>Acciones: <code>SummonGuard()</code>, <code>AttackStart()</code>, <code>AURA_CHECK_TIMER</code>, <code>playerCheckMap</code></li>
+    <li>SpawnAssociation Table: mapeo de NPCs activadores a guardianes según facción y zona</li>
+  </ul>
+
+  <h5>Guardian NPCs</h5>
+  <ul>
+    <li>Control de acceso instantáneo a zonas prohibidas</li>
+    <li>Propiedades: <code>UNIT_FLAG_NON_ATTACKABLE</code>, <code>UpdateAI()</code>, <code>isAttackReady()</code></li>
+    <li>Hechizos: <code>SPELL_DEATHTOUCH</code>, <code>resetAttackTimer()</code></li>
+  </ul>
+
+  <h4>Quest and Event NPCs</h4>
+  <h5>Triage System</h5>
+  <ul>
+    <li>Simulación de emergencia médica para líneas de misiones específicas</li>
+    <li>Coordinación entre doctores y pacientes dinámicos</li>
+    <li>NPCs involucrados: <code>npc_doctor</code>, <code>npc_injured_patient</code></li>
+    <li>Mecánicas: <code>SummonPatientTimer</code>, <code>ModifyHealth(-5)</code>, <code>PatientSaved()</code>, <code>PatientDied()</code></li>
+    <li>Hasta 15 pacientes rastreados; falla automática si mueren más de 5</li>
+  </ul>
+
+  <h5>Darkmoon Faire Fortune Teller</h5>
+  <ul>
+    <li>NPC <code>npc_sayge</code> ofrece buffs de estadísticas mediante diálogo interactivo</li>
+    <li>Escenarios de elección y hechizos asociados: <code>SPELL_DMG</code>, <code>SPELL_RES</code>, <code>SPELL_ARM</code>, <code>SPELL_SPI</code></li>
+    <li>Tiempo de reutilización: 2 horas</li>
+  </ul>
+
+  <h4>Service and Vendor NPCs</h4>
+  <h5>Mount Vendor System</h5>
+  <ul>
+    <li>Vendedores de monturas basados en reputación y raza</li>
+    <li>Ejemplo de asignaciones: RACE_HUMAN → Stormwind, RACE_DWARF → Ironforge, RACE_ORC → Orgrimmar, RACE_TAUREN → Thunder Bluff</li>
+    <li>Funciones principales: <code>getRace()</code>, <code>GetReputationRank()</code>, <code>ADD_GOSSIP_ITEM</code>, <code>SEND_GOSSIP_MENU</code></li>
+  </ul>
+
+  <h5>Rogue Trainer Enhancements</h5>
+  <ul>
+    <li>Capacidades adicionales: reset de talentos, objetos de misión especiales</li>
+  </ul>
+
+  <h4>Pet and Summon NPCs</h4>
+  <h5>Mirror Image System</h5>
+  <ul>
+    <li>Copias inteligentes de magos que ayudan en combate según talentos</li>
+    <li>Funciones: <code>InitializeAI()</code>, <code>GetPrimaryTalentTree()</code></li>
+    <li>Hechizos: <code>SPELL_GLYPH_OF_MIRROR_IMAGE</code>, <code>SPELL_ARCANE_BLAST</code>, <code>SPELL_FIREBALL</code>, <code>SPELL_FROSTBOLT</code></li>
+  </ul>
+
+  <h5>Snake Trap Serpents</h5>
+  <ul>
+    <li>NPCs invocados por cazadores con comportamiento diferenciado y aplicación de venenos</li>
+    <li>Timers: VIPER_TIMER 3000ms, VENOMOUS_SNAKE_TIMER 1500ms</li>
+    <li>Hechizos: <code>SPELL_MIND_NUMBING_POISON</code>, <code>SPELL_CRIPPLING_POISON</code>, <code>SPELL_DEADLY_POISON</code></li>
+  </ul>
+
+  <h4>NPC Registration and Loading</h4>
+  <ul>
+    <li>Todos los NPCs de mundo se registran mediante el sistema central de ScriptLoader</li>
+    <li>Clases heredan de <code>CreatureScript</code> y definen IA específica con métodos virtuales</li>
+    <li>Métodos clave: <code>GetAI()</code>, <code>OnGossipHello()</code>, <code>OnQuestAccept()</code>, <code>UpdateAI()</code>, <code>SpellHit()</code></li>
+    <li>Disponibilidad inmediata al iniciar el servidor y spawn en cualquier zona según funcionalidad</li>
+  </ul>
+</section>
+
+<section id="custom-features-extensions">
+  <h3>Custom Features and Extensions</h3>
+  <p>
+    Esta sección cubre el sistema de carga de scripts personalizados y el marco de extensiones para mejoras y modificaciones específicas del servidor en OlympusCore. Permite ampliar la funcionalidad base de TrinityCore con características únicas para Olympus.
+  </p>
+
+  <h4>Custom Script Loading Framework</h4>
+  <ul>
+    <li>Mecanismo centralizado de carga integrado con el scripting core</li>
+    <li>Punto de entrada principal: <code>AddCustomScripts()</code> durante la inicialización del servidor</li>
+  </ul>
+
+  <h4>Script Registration Architecture</h4>
+  <ul>
+    <li><code>ScriptLoader::LoadDatabase()</code> → <code>AddCustomScripts()</code></li>
+    <li>Categorías de scripts registrados:</li>
+    <ul>
+      <li>Arena & PvP: <code>AddSC_solo_queue()</code>, <code>AddSC_arena_spectator()</code>, <code>AddSC_arena_anti_draw()</code></li>
+      <li>Player Services: <code>AddSC_npc_level_booster()</code>, <code>AddSC_npc_teleport()</code>, <code>AddSC_npc_profession()</code></li>
+      <li>Transmogrification: <code>AddSC_PWS_Transmogrification()</code>, <code>AddSC_CS_Transmogrification()</code></li>
+      <li>Communication: <code>AddSC_world_chat()</code>, <code>AddSC_mod_announcer()</code>, <code>AddSC_auto_stream_announcer()</code></li>
+      <li>Level Progression: <code>AddSC_LearnSpellsOnLevelUp()</code>, <code>AddSC_LevelUpScripts()</code>, <code>AddSC_skip_StarterArea()</code></li>
+      <li>Administrative: <code>AddSC_RestrictGMIsland()</code>, <code>AddSC_instance_Reset()</code>, <code>AddSC_custom_vip_system()</code></li>
+      <li>Utility: <code>AddSC_SpellRegulator()</code>, <code>AddSC_StabilityTest()</code>, <code>AddSC_npcbuff()</code></li>
+    </ul>
+  </ul>
+
+  <h4>Custom Script Categories</h4>
+  <table>
+    <thead>
+      <tr>
+        <th>Categoría</th>
+        <th>Scripts</th>
+        <th>Propósito</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Arena & PvP</td>
+        <td>solo_queue, arena_spectator, arena_anti_draw</td>
+        <td>Mejoras en PvP y espectador</td>
+      </tr>
+      <tr>
+        <td>Player Services</td>
+        <td>npc_level_booster, npc_teleport, npc_profession, npc_reset_quest_status, npcbuff</td>
+        <td>Mejoras y conveniencia para personajes</td>
+      </tr>
+      <tr>
+        <td>Transmogrification</td>
+        <td>PWS_Transmogrification, CS_Transmogrification</td>
+        <td>Modificación de apariencia de equipo</td>
+      </tr>
+      <tr>
+        <td>Communication</td>
+        <td>world_chat, mod_announcer, auto_stream_announcer</td>
+        <td>Sistemas de mensajería global</td>
+      </tr>
+      <tr>
+        <td>Level Progression</td>
+        <td>LearnSpellsOnLevelUp, LevelUpScripts, skip_StarterArea</td>
+        <td>Modificaciones de avance de personajes</td>
+      </tr>
+      <tr>
+        <td>Administrative</td>
+        <td>RestrictGMIsland, instance_Reset, custom_vip_system</td>
+        <td>Gestión de servidor y funciones VIP</td>
+      </tr>
+      <tr>
+        <td>Utility</td>
+        <td>SpellRegulator, StabilityTest, npcbuff</td>
+        <td>Depuración y optimización del servidor</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>Integration with Core Systems</h4>
+  <ul>
+    <li>Integración completa con TrinityCore mediante patrón estándar de registro de scripts</li>
+    <li>Convención de nombres: <code>AddSC_*</code></li>
+    <li>Llamadas durante la inicialización del servidor para registrar scripts personalizados</li>
+  </ul>
+
+  <h4>Extension Development Framework</h4>
+  <ul>
+    <li>Fases del registro de scripts:</li>
+    <ul>
+      <li>Declaración: Funciones declaradas en headers</li>
+      <li>Registro: Funciones llamadas dentro de <code>AddCustomScripts()</code></li>
+      <li>Implementación: Archivos de script individuales definen la lógica</li>
+    </ul>
+    <li>Tipos de scripts soportados:</li>
+    <ul>
+      <li><code>CreatureScript</code>: IA de NPCs</li>
+      <li><code>PlayerScript</code>: Eventos de jugador</li>
+      <li><code>WorldScript</code>: Eventos globales</li>
+      <li><code>CommandScript</code>: Comandos personalizados</li>
+      <li><code>SpellScript</code>: Modificaciones de hechizos</li>
+    </ul>
+  </ul>
+
+  <h4>Modular Enhancement Architecture</h4>
+  <ul>
+    <li>Activación selectiva de características mediante comentarios o preprocesador C++</li>
+    <li>Separación limpia: cada característica en un archivo independiente</li>
+    <li>Integración consistente: mismos patrones de registro y eventos</li>
+    <li>Mantenimiento aislado: actualizaciones individuales sin afectar otros scripts</li>
+    <li>Ejemplos de activación:</li>
+    <ul>
+      <li>Desactivado: <code>/* AddSC_Skirmish_npc(); */</code></li>
+      <li>Activo: <code>AddSC_solo_queue();</code></li>
+      <li>Condicional: <code>#ifdef FEATURE_FLAG AddSC_custom_feature(); #endif</code></li>
+    </ul>
+  </ul>
+</section>
+
+
+      <!-- Pie con edición / navegación adicional -->
+      <footer class="mt-4 small-muted">
+        <div class="d-flex justify-content-between">
+          <div>
+            <strong>Ultima actualización del emulador</strong><br>
+            Último commit: <em>11 de septiembre de 2025</em> (65dca5)
+          </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <!-- Footer global -->
+  <footer class="bg-dark text-light py-4 mt-5">
+    <div class="container text-center">
+      <p class="mb-1">&copy; 2025 Jorge Luis Ramirez Lorenzo — Olympus</p>
+      <p class="mb-0">
+        Contacto:
+        <a href="mailto:jorgeluisramirezlorenzo@gmail.com" class="text-info">Email</a> |
+        <a href="https://wa.me/+5358160709" target="_blank" class="text-info">WhatsApp</a> |
+        <a href="https://discord.com/users/692980061002793010" target="_blank" class="text-info">Discord</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
